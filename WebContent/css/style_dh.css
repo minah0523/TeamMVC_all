@@ -1,0 +1,251 @@
+@CHARSET "UTF-8";
+
+.widthController {
+	/* ---------------전체적인 크기를 화면을 꽉채우지 않고 적당량 줄여주는 코드 */
+	width: 80%;
+}
+
+#userInfo {
+	/* ---------------유저의 정보를 DB에서 받아온뒤 화면상에 출력해주는 부분--------------- */
+	width: 80%;
+	border: 1px solid #E2E2E2;
+	margin-top: 30px;
+	margin-bottom: 30px;
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
+
+/* ---------------주소정보 테이블 설정시작  ---------------*/
+table#addressInfoTbl {
+	border: 1px solid #B2B2B2;
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th, td {
+	border: 1px solid #B2B2B2;
+	border-left: none;
+	border-right: none;
+}
+
+td.td_title {
+	border-right: 1px solid #B2B2B2;
+}
+
+#addressInfoTbl>tbody>tr>td {
+	padding: 10px;
+}
+
+/* ---------------상품컨트롤러 코드--------------- */
+div.head {
+	padding-top: 22px;
+	background-color: #dcdcdc;
+	height: 70px;
+}
+
+div.data {
+	padding-bottom: 40px;
+	padding-top: 20px;
+	border-bottom: solid 1px #E2E2E2;
+	height: 150px;
+}
+
+#orderform>div.data>div.notimg {
+	padding-top: 42px;
+}
+
+/* 헤더부분 (상품선택제거, 상품전체제거) 버튼 과 주문 컨트롤러간의 공백 추가 */
+#orderform>div.widthController.headBtn {
+	margin-top: 20px;
+}
+
+div.heightParent {
+	height: 200px;
+}
+/* ---------------상품의 갯수 출력--------------- */
+#PaymentContainer > div.widthController.sum_p_num {
+	font-size: 20pt;
+	font-weight: bold;
+	color: black;
+	margin-top: 30px;
+	margin-bottom: 30px;
+}
+
+/* ---------------상품의 총액 출력--------------- */
+#PaymentContainer > div.widthController.sum_p_price {
+	font-size: 20pt;
+	color: #87cefa;
+	font-weight: bold;
+	margin-bottom: 40px;
+}
+
+/*상품주문 버튼*/
+button.orderBtn {
+	margin-top: 30px;
+}
+
+/* ---------------상품의 총액테이블 출력--------------- */
+table#totalTbl {
+	margin-top: 50px;
+	border: 1px solid #dcdcdc;
+	border-collapse: collapse;
+}
+
+#totalTbl>thead>tr>td, #totalTbl>tbody>tr>td {
+	height: 39px;
+	border-left: 1px solid #e9e9e9;
+	line-height: 39px;
+	color: black;
+	text-align: center;
+}
+
+#totalTbl>thead>tr>td {
+	background-color: #dcdcdc;
+	font-size: 12pt;
+	font-weight: bold;
+}
+
+#totalTbl>tbody>tr>td {
+	height: 58px;
+	line-height: 58px;
+	font-size: 23px;
+	font-weight: bold;
+}
+
+/* ---------------결제페이지의 추천상품 캐러셀 스타일--------------- */
+/*Greatest offer News*/
+div#RecommendItem{
+	margin-top: 100px;
+}
+.owl-dots{display:none;}
+.owl-item img{
+    height: 250px;
+    margin-bottom: 100px;
+}
+.customPrevBtn, .customNextBtn{
+    background : none;
+    border: none;
+    color: #999999;
+    font-size: 20px;
+    font-weight: bold;
+}
+.owl-carousel .nav-btn{
+  height: 47px;
+  position: absolute;
+  width: 26px;
+  cursor: pointer;
+  top: 100px !important;
+}
+
+.owl-carousel .owl-prev.disabled,
+.owl-carousel .owl-next.disabled{
+pointer-events: none;
+opacity: 0.2;
+}
+
+.owl-carousel .prev-slide{
+  background: url(nav-icon.png) no-repeat scroll 0 0;
+  left: -33px;
+}
+.owl-carousel .next-slide{
+  background: url(nav-icon.png) no-repeat scroll -24px 0px;
+  right: -33px;
+}
+.owl-carousel .prev-slide:hover{
+ background-position: 0px -53px;
+}
+.owl-carousel .next-slide:hover{
+background-position: -24px -53px;
+}   
+/* ---------------결제페이지의 추천상품 캐러셀 스타일--------------- */
+
+
+	
+	div.head {
+		padding-top: 22px;
+		background-color: #E2E2E2;
+		height: 70px;
+		width: 80%;
+	}
+	div.data{
+		margin-top: 12px;
+		width: 80%;
+	}
+	div.check {
+		padding-left: 2px;
+	}
+	
+	.abutton{
+	}
+
+	.wrap{
+	    max-width: 480px;
+	    margin: 0 auto; /* 화면 가운데로 */
+	    background-color: #fff;
+	    height: 100%;
+	    padding: 20px;
+	    box-sizing: border-box;
+	
+	}
+	.reviewform textarea{
+	    width: 100%;
+	    padding: 10px;
+	    box-sizing: border-box;
+	}
+	.rating .rate_radio {
+	    position: relative;
+	    display: inline-block;
+	    z-index: 20;
+	    opacity: 0.001;
+	    width: 60px;
+	    height: 60px;
+	    background-color: #fff;
+	    cursor: pointer;
+	    vertical-align: top;
+	    display: none;
+	}
+	.rating .rate_radio + label {
+	    position: relative;
+	    display: inline-block;
+	    margin-left: -4px;
+	    z-index: 10;
+	    width: 60px;
+	    height: 60px;
+	    background-image: url('./img/starrate.png');
+	    background-repeat: no-repeat;
+	    background-size: 60px 60px;
+	    cursor: pointer;
+	    background-color: #f0f0f0;
+	}
+	.rating .rate_radio:checked + label {
+	    background-color: #ff8;
+	}
+	
+	.cmd{
+	    margin-top: 20px;
+	    text-align: right;
+	}
+	.cmd input[type="button"]{
+	    padding: 10px 20px;
+	    border: 1px solid #e8e8e8;
+	    background-color: #fff;
+	    background-color:#000;  
+	    color: #fff;
+	}
+	
+	.warning_msg {
+	    display: none;
+	    position: relative;
+	    text-align: center;
+	    background: #ffffff;
+	    line-height: 26px;
+	    width: 100%;
+	    color: red;
+	    padding: 10px;
+	    box-sizing: border-box;
+	    border: 1px solid #e0e0e0;
+	}
+
+
+

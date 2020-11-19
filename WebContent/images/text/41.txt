@@ -1,0 +1,5 @@
+Name : Classic OverFit Coat
+Size : S,M,L
+Price : 79000
+Gender : Male
+Color : Brown/ Black

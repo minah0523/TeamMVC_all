@@ -1,0 +1,5 @@
+Name : wool tri-coloured collectivization jumper
+Size : S,M,L
+Price : 58000
+Gender : Male
+Color : Navy, Ivory

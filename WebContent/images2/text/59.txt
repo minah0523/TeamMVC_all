@@ -1,0 +1,9 @@
+training
+
+MALE/FEMALE
+
+S/M/L/XL/XXL
+
+99,000
+
+BLACK/NAVY/RED

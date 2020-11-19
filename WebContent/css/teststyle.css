@@ -1,0 +1,407 @@
+/*
+Credit : LearnDesign(Youtube Channel)
+Channel Link : https://goo.gl/5pskoC
+Email : help.learndesign@gmail.com
+*/
+
+
+
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	outline: none;
+	vertical-align: baseline;
+	box-sizing: border-box;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+input{
+	box-sizing: border-box;
+	outline: none;
+}
+body {
+	line-height: 1;
+	font-family: open sans;
+	font-size: 14px;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+img{
+	max-width: 100%;
+}
+
+.container{
+	width: 90%;
+	margin: 0 auto;
+}
+
+
+/*Offer Card Style*/
+.offer-card{
+	width: 296px;
+	height: 200px;
+	display: inline-block;
+	margin-left: 25px;
+	margin-top: 15px;
+	border-radius: 4px;
+	overflow: hidden;
+	color: #333;
+	
+}
+.offer-card img{
+	width: 100%;
+	height: 200px;
+	color: #333;
+}
+
+
+/*Product Area Style*/
+.product-area{
+	width: 100%;
+	float: left;
+	display: inline-block;
+	padding: 25px 0;
+	color: #333;
+}
+/*Product Area Heading*/
+.product-area h3{
+	font-size: 28px;
+	color: #333;
+	text-transform: uppercase;
+	border-bottom: solid 1px #d2d2d2;
+	font-weight: 600;
+	padding: 10px 0;
+	margin-bottom: 30px;
+}
+.product-area .col-3{
+	width: 24%;
+	float: left;
+	display: inline-block;
+	border-radius: 4px;
+	overflow: hidden;
+	margin: 0 .5% 35px;
+}
+.product-area a{
+	font-size: 14px;
+	columns: #333;
+	text-decoration: none;
+	text-align: center;
+	position: relative;
+}
+.product-area .caption{
+	padding: 10px 0;
+}
+.product-area a big{
+	font-weight: 600;
+}
+.product-area a h4{
+	font-size: 15px;
+	padding: 8px 0;
+	font-weight: 600;
+	line-height: 22px;
+	color: #737373;
+}
+
+/*Product Price Button Style*/
+.product-area a .price{
+	font-size: 18px;
+	font-weight: 700;
+	color: #333;
+	background-color: #ffe4b3;
+	border: none;
+	padding: 10px 25px;
+	border-radius: 4px;
+	margin-top: 10px;
+}
+
+/*Product View Button*/
+.productViewBtn{
+	font-size: 18px;
+	font-weight: 700;
+	color: #333;
+	visibility: hidden;
+	background-color: #A5907B;
+	border: none;
+	width: 100%;
+	padding: 10px 25px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+.product-area a:hover .productViewBtn{
+	visibility: visible;
+}
+
+
+
+/*Other Inforamtion Style*/
+.otherInfo{
+	width: 100%;
+	display: inline-block;
+	float: left;
+	padding: 0 0 25px;
+	text-align: center;
+	color: #333;
+}
+.otherInfoHandle{
+	font-size: 18px;
+	font-weight: 600;
+	padding: 15px 0;
+	cursor: pointer;
+	color: #333;
+	text-decoration: underline;
+}
+.otherInfoBody{
+	font-size: 16px;
+	line-height: 24px;
+	padding: 0 80px;
+	color: #333;
+}
+.otherInfoBody p{
+	margin-bottom: 15px;
+	color: #333;
+}
+
+
+/*ProductViewBox Style*/
+.productViewBox{
+	width: 90%;
+	height: 90%;
+	margin: auto auto;
+	background-color: gray;
+	color: #333;
+	position: fixed;
+	top: 0; bottom: 0;
+	left: 0; right: 0;
+	z-index: 999;
+	border: solid 1px #A5907B;
+	border-radius: 4px;
+	background-color: #fff2d7;
+	box-shadow: 0 5px 250px #000;
+	padding: 15px 25px;
+	overflow-y: auto;
+	display: none;
+}
+.productViewBox h3{
+	font-size: 24px;
+	font-weight: 700;
+	padding-bottom: 15px;
+	margin-bottom: 15px;
+	border-bottom: solid 1px;
+	color: #333;
+}
+.productViewBox-closeBtn{
+	float: right;
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 35px;
+	height: 35px;
+	margin: 10px;
+	border-radius: 50px;
+	background-color: #A5907B;
+	color: #fff;
+	font-size: 18px;
+	text-align: center;
+	line-height: 35px;
+}
+.productViewBoxImg{
+	width: 45%;
+	float: left;
+	padding: 15px;
+	background-color: #fff;
+	border: solid 1px #dadada;
+}
+.productViewBoxImg img{
+	width: 100%;
+}
+.productViewBoxDetail{
+	width: 50%;
+	float: right;
+}
+.productViewBoxDetail h5{
+	font-size: 18px;
+	margin-bottom: 15px;
+	line-height: 28px;
+	font-weight: 500;
+	color: #333;
+}
+.productViewBoxDetail h5 b{
+	font-weight: 600;
+	color: #000;
+}
+.productViewBoxDetail .addtocart{
+	border: solid 1px;
+	color: #A5907B;
+	font-size: 18px;
+	font-weight: 600;
+	text-decoration: none;
+	padding: 10px 15px;
+	border-radius: 4px;
+	display: inline-block;
+}
+.productViewBoxDetail .writereview{
+	color: #333;
+	font-size: 16px;
+	font-weight: 600;
+	text-decoration: none;
+	padding: 10px 15px;
+	border-radius: 4px;
+	margin-left: 20px;
+	display: inline-block;
+}
+.productViewBoxDetail .buynow{
+	border: solid 1px #A5907B;
+	background-color: #A5907B;
+	color: #fff;
+	font-size: 20px;
+	text-transform: uppercase;
+	font-weight: 700;
+	text-decoration: none;
+	padding: 15px 25px;
+	border-radius: 4px;
+	margin-top: 20px;
+	width: 60%;
+	text-align: center;
+	display: inline-block;
+}
+
+
+/*Product Detail Page Style*/
+.product-detail{
+	display: inline-block;
+	float: left;
+	width: 100%;
+	padding: 45px 0;
+}
+.product-detail h3{
+	font-size: 40px;
+	padding: 15px 0;
+}
+.product-detail-left{
+	float: left;
+	width:40%;
+}
+.product-detail-right{
+	float: right;
+	width: 55%;
+	color: #333;
+}
+.product-detail-right h3{
+	font-size: 22px;
+	line-height: 24px;
+	padding-top: 0;
+}
+.product-detail-right h3 small{
+	font-size: 14px;
+	color: gray;
+}
+.product-detail-right h5{
+	font-size: 18px;
+	margin-bottom: 20px;
+	color: gray;
+}
+.product-detail-right h5 b{
+	color: #000;
+}
+.product-detail-right .addtocart{
+	border: solid 1px #A5907B;
+	background-color: #A5907B;
+	color: #fff;
+	font-size: 18px;
+	font-weight: 600;
+	text-decoration: none;
+	padding: 10px 15px;
+	border-radius: 4px;
+	display: inline-block;
+}
+.product-detail-right .writereview{
+	border: solid 1px #A5907B;
+	background-color: #A5907B;
+	color: #fff;
+	font-size: 18px;
+	font-weight: 600;
+	text-decoration: none;
+	padding: 10px 15px;
+	border-radius: 4px;
+	display: inline-block;
+	margin-left: 20px;
+}
+.product-detail-right .buynow{
+	border: solid 1px #A5907B;
+	background-color: #A5907B;
+	color: #fff;
+	font-size: 20px;
+	text-transform: uppercase;
+	font-weight: 700;
+	text-decoration: none;
+	padding: 15px 25px;
+	border-radius: 4px;
+	margin-top: 20px;
+	width: 60%;
+	text-align: center;
+	display: inline-block;
+}
+
+.product-detail-feature{
+	width: 100%;
+	float: left;
+	display: inline-block;
+	margin-top: 25px;
+	padding: 15px;
+	background-color: #A5907B;
+	color: white
+}
+.product-detail-feature h3{
+	font-weight: 500;
+	border-bottom: solid 1px;
+	color: white;
+}
+.product-detail-feature p{
+	padding: 15px 0;
+	font-size: 18px;
+	border-bottom: solid 1px #dedede;
+	width: 50%;
+	float: left;
+	color: white;
+}
+
+.product-detail-left img{
+	max-width: inherit;
+}
+

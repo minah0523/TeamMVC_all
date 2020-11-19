@@ -1,0 +1,5 @@
+Name : Time Blen Single Coat
+Size : S,M,L
+Price : 47700
+Gender : Male
+Color : BLACK/ GRAY

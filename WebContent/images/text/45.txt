@@ -1,0 +1,5 @@
+Name : Camping jumper
+Size : S,M,L
+Price : 41000
+Gender : Male
+Color : white

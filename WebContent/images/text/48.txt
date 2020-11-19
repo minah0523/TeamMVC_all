@@ -1,0 +1,5 @@
+Name : padding vest
+Size : M
+Price : 15800
+Gender : Male
+Color : Black, Grey, Wine.
