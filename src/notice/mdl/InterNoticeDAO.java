@@ -19,5 +19,9 @@ public interface InterNoticeDAO {
 
 	// 공지사항 업데이트하기
 	int updateNotice(NoticeVO nvo) throws SQLException;
+
+	// 공지사항 삭제하기
+	int deleteNotice(String noticeno) throws SQLException;
+
 	
 }
