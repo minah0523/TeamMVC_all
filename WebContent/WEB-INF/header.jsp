@@ -63,10 +63,10 @@
 		cursor:pointer;
 	}
 	
-	#Cart {
+	#Notice {
 		margin-left : 80px;
-	}	
-	
+	}
+
 	#Main_Search_Input {
 		border: solid 3px #BCA897;	
 		width: 250px;
@@ -249,6 +249,8 @@
 			</div>
 			
 			<div class="col-md-4" id="Login_MyInfo_Cart">
+				<a id = "Notice" href="<%= ctxPath %>/notice/notice.neige" >공지사항 </a> <span class= "delimiter" >|</span>
+				
 				<a id = "Cart" href="<%= ctxPath %>/product/productCart.neige" >장바구니 </a> <span class= "delimiter" >|</span>
 				
 				<c:if test="${!empty sessionScope.loginuser}">

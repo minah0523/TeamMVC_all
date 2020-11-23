@@ -62,7 +62,7 @@
 		padding-bottom: 9px;
 	}
 	
-	#Cart {
+	#Notice {
 		margin-left : 80px;
 	}	
 	
@@ -223,11 +223,35 @@
 			</div>
 			
 			<div class="col-md-4" id="Login_MyInfo_Cart">
+				<a id = "Notice" href="<%= ctxPath %>/notice/notice.neige" >공지사항 </a> <span class= "delimiter" >|</span>
+				
 				<a id = "Cart" href="<%= ctxPath %>/product/productCart.neige" >장바구니 </a> <span class= "delimiter" >|</span>
-				<a href="<%= ctxPath %>/member/myPage.neige">내정보 </a>  <span class= "delimiter">|</span>
-				<a href="<%= ctxPath %>/member/memberRegister.neige">회원가입 </a> <span class= "delimiter" >|</span>
-				<a href="<%= ctxPath %>/login/login.neige">로그인</a> <span class= "delimiter" >|</span>
-				<a href="<%= ctxPath %>/product/productRegister.neige">제품등록</a>
+				
+				<c:if test="${!empty sessionScope.loginuser}">
+                     <a href="<%= ctxPath %>/member/myPage.neige">마이페이지 </a>
+                     <span class="delimiter">|</span>
+                </c:if>
+                     
+				<c:if test="${empty sessionScope.loginuser}">
+                      <a href="<%= ctxPath %>/member/memberRegister.neige">회원가입 </a>
+                      <span class="delimiter">|</span>
+                </c:if>
+				
+				
+				<%-- <a href="<%= ctxPath %>/login/loginPage.neige">로그인</a> <span class= "delimiter" >|</span> --%>		
+                <c:choose>
+                   <c:when test="${empty sessionScope.loginuser}">
+                      <a href="<%= ctxPath %>/login/loginPage.neige">로그인</a>
+                   </c:when>
+                   <c:otherwise>
+                     <%--  <span style="color:orange"> ${(sessionScope.loginuser).userid}님</span>  --%>
+                     <a href="<%= ctxPath %>/login/logout.neige">로그아웃</a>&nbsp;<span class= "delimiter" >|</span>
+                   </c:otherwise>
+
+                </c:choose>
+                <c:if test="${sessionScope.loginuser.userid == 'admin'}">
+					<a href="<%= ctxPath %>/admin/adminMain.neige">관리자</a>	
+				</c:if>
             </div>
             
 		</div>
