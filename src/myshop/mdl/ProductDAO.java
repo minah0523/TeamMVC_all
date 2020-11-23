@@ -1106,18 +1106,23 @@ public class ProductDAO implements InterProductDAO {
 			try {
 				conn = ds.getConnection(); // DBCP에서 connection 받아오기
 				
-				String sql = " select p.pdno, pdname, PDCATEGORY_FK, PDIMAGE1, PDIMAGE2, pdqty, price, saleprice, pdcontent, point, pdinputdate, texture, pdgender \n "+
-							 " from \n "+
-							 " ( \n "+
-							 " select pdno_fk \n "+
-							 " from TBL_CART  \n "+
-							 " where userid_fk = ? "+
-							 " )v inner join TBL_PRODUCT p \n " +
-							 " on v.pdno_fk = p.pdno ";
+				String sql = "select pd.pdno, pdname, PDCATEGORY_FK, PDIMAGE1, PDIMAGE2, pdqty, price, saleprice, pdcontent, point, pdinputdate, texture, pdgender, w.userid_fk, w.pinfono, w.pqty, w.pcolor, w.psize\n"+
+						"from\n"+
+						"(\n"+
+						"select v.userid_fk, v.pinfono, v.pqty, pdno_fk, pcolor, psize\n"+
+						"from\n"+
+						"(\n"+
+						"select cartno, userid_fk, pinfono, pqty, registerday\n	"+
+						"from TBL_cart \n"+
+						"where userid_fk = ?\n"+
+						")v inner join tbl_product_info p\n"+
+						"on v.pinfono = p.PINFONO\n"+
+						")w inner join tbl_product pd\n"+
+						"on w.pdno_fk = pd.pdno";
 				
 				pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
 				
-				pstmt.setString(1, "siasia");
+				pstmt.setString(1, userid);
 				
 				rs = pstmt.executeQuery(); // select 되어진 결과를 resultSet에 받는다.
 				
@@ -1146,7 +1151,7 @@ public class ProductDAO implements InterProductDAO {
 			
 			return cartList;
 		}
-		
+
 		@Override
 		public void productAllDelete(int pdno, String userid_fk) throws SQLException {
 			
@@ -1208,12 +1213,107 @@ public class ProductDAO implements InterProductDAO {
 				pstmt.setString(1, "siasia");
 				pstmt.setInt(2, pdno);
 				
-				int result = pstmt.executeUpdate();
+				pstmt.executeUpdate();
 				
 			} finally {
 				close();
 			}
 			
+		}
+
+		@Override
+		public List<ProductInfoVO> getSizeAndColor(String userid) throws SQLException {
+			
+			List<ProductInfoVO> productInfoList = new ArrayList<ProductInfoVO>();
+			
+			try {
+				conn = ds.getConnection(); // DBCP에서 connection 받아오기
+				
+				String sql = " select pi.PINFONO, PDNO_FK, pcolor, psize "+
+							 " from "+
+							 " ( "+
+							 " select pinfono "+
+							 " from tbl_cart "+
+							 " where userid_fk = ? "+
+							 " )v inner join tbl_product_info pi "+
+							 " on v.pinfono = pi.pinfono ";
+				
+				pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+				
+				pstmt.setString(1, userid);
+				
+				rs = pstmt.executeQuery(); // select 되어진 결과를 resultSet에 받는다.
+				
+				while(rs.next()) {
+					ProductInfoVO pinfovo = new ProductInfoVO();
+					
+					pinfovo.setPinfono(rs.getInt(1));
+					pinfovo.setPdno_fk(rs.getInt(2));
+					pinfovo.setPcolor(rs.getString(3));
+					pinfovo.setPsize(rs.getString(4));
+					
+					productInfoList.add(pinfovo);
+				} // end of while(rs.next()) ---------------------------
+			} finally {
+				close();
+			}
+			
+			return productInfoList;
+		}
+
+		@Override
+		public String RecordOrder(Map<String, String> paraMap) throws SQLException {
+
+			String result = "";
+			
+			try {
+				conn = ds.getConnection(); // DBCP에서 connection 받아오기
+				
+				String sql = " delete from TBL_CART where userid_fk = ? ";
+				
+				pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+				
+				pstmt.setString(1, paraMap.get("userid_fk"));
+				
+				pstmt.executeUpdate();
+				
+				//==================================================================================//
+				
+				sql = " insert into tbl_order(odrcode, userid_fk, ODRTOTALPRICE, ODRTOTALPOINT) "
+				    + " values (seq_tbl_order.nextval,?,?,?) ";
+				
+				pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+				
+				pstmt.setString(1,paraMap.get("userid_fk"));
+				pstmt.setString(2,paraMap.get("finalPrice"));
+				pstmt.setString(3,paraMap.get("usePoint"));
+				
+				//==================================================================================//
+				
+				sql = " select to_char(ODRDATE,'yyyy-mm-dd hh24:mi') "+
+							 " from "+
+							 " ( "+
+							 " select * "+
+							 " from tbl_order "+
+							 " where userid_fk = ? "+
+							 " order by odrdate desc "+
+							 " ) "+
+							 " where rownum = 1 ";
+				
+				pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+				
+				pstmt.setString(1,paraMap.get("userid_fk"));
+				
+				rs = pstmt.executeQuery();
+				
+				while(rs.next()) {
+					result = rs.getString(1);
+				}
+			} finally {
+				close();
+			}
+			
+			return result;
 		}
 
 
