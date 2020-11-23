@@ -33,7 +33,22 @@ public interface InterProductDAO {
 	int product_imagefile_Insert(int pdno, String plusPdimage) throws SQLException;
 	
 	// 색상과 사이즈를 insert하는 메소드(JIEUN)
-	int product_info_insert(Map<String, Object> paraMap) throws SQLException;
+	int product_info_insert(int pdno, String pcolor, String psize) throws SQLException;
+	
+	// 관리자 페이지에서 상품(번호, 카테고리, 상품명, 재고, 가격, 성별) 리스트 가져오는(select) 메소드(JIEUN)
+	List<ProductVO> adminProductListAll() throws SQLException;
+	
+	// 관리자 페이지에서 상품(번호, 카테고리, 상품명, 재고, 가격, 성별) 리스트 가져오는(select) 메소드(검색결과도 같이 조회 할 수 있도록)(JIEUN)
+	List<ProductVO> adminProductListAll(Map<String, String> paraMap) throws SQLException;
+	
+	// 페이징처리를 위해서 총 제품 개수와 페이지 개수 알아오기(select) (JIEUN)
+	int getTotalPage(Map<String, String> paraMap) throws SQLException;	
+	
+	// 관리자페이지의 상품 관리 리스트 중 하나 클릭 했을때 pdno로 데이터를 받아서 상품정보 조회해서 받아오자(JIEUN)
+	ProductVO adminProductDetail(String pdno) throws SQLException;	
+	
+	// 관리자페이지의 상품 관리 리스트 중 하나 클릭 했을때 pdno로 데이터를 받아서 색상, 사이즈 가져오기 (JIEUN)
+	List<ProductInfoVO> productInfoDetail(String pdno) throws SQLException;	
 	
 	// search페이지에 보여지는 상품이미지파일명을 모두 조회(select)하는 메소드 (MINA)
 	List<ProductVO> searchProduct(Map<String, String> paraMap) throws SQLException;
