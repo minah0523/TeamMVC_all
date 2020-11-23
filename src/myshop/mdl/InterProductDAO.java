@@ -59,16 +59,22 @@ public interface InterProductDAO {
 	
 	
 	// 장바구니 테이블에 존재하는 row를 특정유저(로그인된 유저)의 아이디와 제품번호를 사용하여
-	   // select 해온뒤 List에 담는다. 그 뒤 해당 List를 이용하여 반복문을 사용해 선택한 제품을 화면에 출력  (동휘)
-	   List<ProductVO> getCartList(String userid) throws SQLException;
-	   
-	   // 장바구니 테이블 안에 userid_fk로 입력받은 사람의 모든 열을 삭제, 전체삭제버튼 (동휘)
-	   void productAllDelete(int arrPdno, String userid_fk) throws SQLException;
-	   
-	   // 상품 개별삭제 버튼을 누를경우 유저의 ID와 해당 제품의 번호를 받아와 DB테이블에서 삭제해주는 메서드(동휘)
-	   int productOneDelete(String pdno, String userid_fk) throws SQLException;
-	   
-	   // 장바구니에서 선택상품들을 DB테이블에서 삭제시키는 메서드(동휘)
-	   void productChoiceDelete(int pdno, String userid_fk) throws SQLException;
+	// select 해온뒤 List에 담는다. 그 뒤 해당 List를 이용하여 반복문을 사용해 선택한 제품을 화면에 출력  (동휘)
+	List<ProductVO> getCartList(String userid) throws SQLException;
+	
+	// 장바구니 테이블 안에 userid_fk로 입력받은 사람의 모든 열을 삭제, 전체삭제버튼 (동휘)
+	void productAllDelete(int arrPdno, String userid_fk) throws SQLException;
+	
+	// 상품 개별삭제 버튼을 누를경우 유저의 ID와 해당 제품의 번호를 받아와 DB테이블에서 삭제해주는 메서드(동휘)
+	int productOneDelete(String pdno, String userid_fk) throws SQLException;
+	
+	// 장바구니에서 선택상품들을 DB테이블에서 삭제시키는 메서드(동휘)
+	void productChoiceDelete(int pdno, String userid_fk) throws SQLException;
+	
+	// 장바구니테이블의 userid를 기반으로 상품상세테이블에서 사이즈, 색상들을 받아오는 메서드(동휘)
+	List<ProductInfoVO> getSizeAndColor(String userid) throws SQLException;
+
+	// 주문이 완료된뒤 총가격, 총 적립 포인트 등을 주문 테이블에 insert하는 메서드(동휘)
+	String RecordOrder(Map<String, String> paraMap) throws SQLException;
 	
 }
