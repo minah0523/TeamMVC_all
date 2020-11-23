@@ -265,11 +265,11 @@
 				<%-- <a href="<%= ctxPath %>/login/loginPage.neige">로그인</a> <span class= "delimiter" >|</span> --%>		
                 <c:choose>
                    <c:when test="${empty sessionScope.loginuser}">
-                      <a href="<%= ctxPath %>/login/loginPage.neige">로그인</a><span class= "delimiter" >|</span>
+                      <a href="<%= ctxPath %>/login/loginPage.neige">로그인</a>
                    </c:when>
                    <c:otherwise>
                      <%--  <span style="color:orange"> ${(sessionScope.loginuser).userid}님</span>  --%>
-                     <a href="<%= ctxPath %>/login/logout.neige">로그아웃</a><span class= "delimiter" >|</span>
+                     <a href="<%= ctxPath %>/login/logout.neige">로그아웃</a>&nbsp;<span class= "delimiter" >|</span>
                    </c:otherwise>
 
                 </c:choose>
@@ -314,3 +314,4 @@
 <div id="contents" align="center">
 
 <!-- <br><br><br><br><br><br> -->
+
