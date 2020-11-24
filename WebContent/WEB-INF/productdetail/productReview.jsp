@@ -7,6 +7,6 @@
 <title>product review page</title>
 </head>
 <body>
-리뷰 페이지?!?
+리뷰 페이지
 </body>
 </html>
