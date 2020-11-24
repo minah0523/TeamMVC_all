@@ -229,7 +229,7 @@
 			<div class="col-md-3" id="Gender_Category">
 				<ul id="header_gender">
 					<li value = "1" id= "man">
-						<a href ="javascript:void(0);" onclick="manClick();">MAN</a>
+						<a href ="javascript:void(0);" onclick="manClick();">MEN</a>
 					</li>
 					<li value = "2" id= "women">
 						<a href="javascript:void(0);" onclick="womenClick();">WOMEN</a>
