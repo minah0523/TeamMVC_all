@@ -1,17 +1,14 @@
 package product.ctrl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import common.ctrl.AbstractController;
-import member.mdl.InterMemberDAO;
-import member.mdl.MemberDAO;
-import member.mdl.MemberVO;
+import member.mdl.*;
+import myshop.mdl.CartVO;
 import myshop.mdl.InterProductDAO;
 import myshop.mdl.ProductDAO;
 import myshop.mdl.ProductInfoVO;
@@ -26,9 +23,9 @@ public class ProductDetailAction extends AbstractController {
 	
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-/*		
+		
 		String method = request.getMethod(); // "GET" or "POST"
-	      
+	/*      
 	      if("GET".equalsIgnoreCase(method)) {
 	    	  super.setRedirect(false);
 	    	  super.setViewPage("/WEB-INF/login/loginPage.jsp");
@@ -95,41 +92,91 @@ public class ProductDetailAction extends AbstractController {
 */		  
 		
 		// System.out.println("@@@ 확인용 IndexController의 메소드 execute호출됨");
-				String pdno = "51";
-				
-				//pdno = request.getParameter("pdno");
-				System.out.println("pdno : " + pdno);
-				
-		/*
-				//캐러셀의 생성으로 이미지 파일을 DB상에 만들 경우 사용가능하다.
-				InterProductDAO pdao = new ProductDAO(); DAO 객체 생성
-				
-				List<ImageVO> imgList = pdao.ImageSelectAll();
-				
-				request.setAttribute("imgList", imgList);
-		*/
 				
 				InterProductDAO pdao = new ProductDAO();
-		/*		
-				List<ProductVO> productList = pdao.ProductList();
-				request.setAttribute("productList", productList);
-		*/		
-				/*
-				 * List<CartVO> cartList = pdao.CartList(); request.setAttribute("cartList", cartList);
-				 */ 
+				String pdno = "";
+				
+				pdno = request.getParameter("pdno");
+				System.out.println("pdno : " + pdno);
+				
+				// 제품번호를 가지고서 해당 제품의 정보를 조회해오기
+				//ProductVO pvo = pdao.selectOneProductByPnum(pdno);
+				
+				String addcartcheck = request.getParameter("addcartcheck");
+				
+				System.out.println("addcartcheck : " + addcartcheck);
+				
+				String userid = request.getParameter("userid");
+				String color = request.getParameter("pcolor");
+				String size = request.getParameter("psize");
+				String qty = request.getParameter("qty"); 
+				
+				System.out.println("pd action userid : " + userid);
+				System.out.println("pdaction color : " + color);
+				System.out.println("pdaction size : " + size);
+				System.out.println("pdaction qty : " + qty);
+				
+				
+				Map<String,String> paraMap = new HashMap<>();
+				paraMap.put("addcartcheck", addcartcheck);
+				paraMap.put("pdno", pdno);
+				paraMap.put("userid", userid);
+				paraMap.put("color", color);
+				paraMap.put("size", size);
+				paraMap.put("qty", qty);
+				System.out.println("DetailAction addcartcheck Check1 : " + addcartcheck);
+				
+				System.out.println("DetailAction paraMap Check1 : " + paraMap);
+				
+/*
+ * 1124
+ * 				String addcart = request.getParameter("addcart");
+				
+				System.out.println("addcartcheck : " + addcart);
+				
+				String cartno = request.getParameter("cartno");
+				
+				String userid_fk = request.getParameter("userid_fk");
+				String pcolor = request.getParameter("pcolor");
+				String psize = request.getParameter("psize");
+				String pqty = request.getParameter("pqty"); 
+				
+				System.out.println("pd action cartno : " + cartno);
+				System.out.println("pd action userid : " + userid_fk);
+				System.out.println("pdaction color : " + pcolor);
+				System.out.println("pdaction size : " + psize);
+				System.out.println("pdaction qty : " + pqty);
+				
+				
+				Map<String,String> paraMap = new HashMap<>();
+				paraMap.put("addcart", addcart);
+				paraMap.put("cartno", cartno);
+				paraMap.put("userid_fk", userid_fk);
+				paraMap.put("pcolor", pcolor);
+				paraMap.put("psize", psize);
+				paraMap.put("pqty", pqty);
+				
+				System.out.println("DetailAction addcartcheck Check1 : " + addcart);
+				
+				System.out.println("DetailAction paraMap Check1 : " + paraMap);
+*/				
+				
+				
+				
 				
 				List<ProductVO> productList = pdao.ProductList(pdno);
 				request.setAttribute("productList", productList);
+				System.out.println("detail action check" + productList);
 				
-				List<ProductInfoVO> productinfoList = pdao.ProductInfoList();
+				List<ProductInfoVO> productinfoList = pdao.ProductInfoList(pdno);
 				request.setAttribute("productinfoList", productinfoList);
 				System.out.println("detail action check2 : " +productinfoList);
-				//System.out.println(productinfoList);
 				
-				super.setRedirect(false);
-		super.setViewPage("/WEB-INF/productdetail/ProductDetail.jsp");
+				//super.setRedirect(false);
+				super.setViewPage("/WEB-INF/productdetail/ProductDetail.jsp");
 		
 	}
 	
 }
+
 
