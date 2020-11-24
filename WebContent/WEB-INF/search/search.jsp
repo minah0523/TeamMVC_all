@@ -14,7 +14,7 @@
    div#Menu_Items{
       visibility:hidden;
    }
-   div#contents{
+   div#searchArea{
       color: gray;
    }
    div.titleArea{
@@ -40,6 +40,7 @@
        margin: 0 auto;
        padding: 0 47px;
    }
+
    div.genderRadio > div{
       display: inline;
       margin: 30px 0;
@@ -92,7 +93,7 @@
       margin: 30px 60px;
    }
    ul.orderBy>li{
-      padding: 0 10px 0 0 ;
+      padding: 0 ;
       display: inline;
    }
    ul{
@@ -135,6 +136,9 @@
       color: gray; 
       margin: 0 auto;
    }
+   li.sort > span {
+   		margin: 0 5px; 
+   }
 
 
 </style>
@@ -157,7 +161,7 @@
           $("input:radio[name='gender']:radio[value='${requestScope.pdgender}']").prop('checked', true);
        }
        
-       if(   ${requestScope.pdcategory_fk != null} ) {
+       if( ${requestScope.pdcategory_fk != null} ) {
           $("select#category").val("${requestScope.pdcategory_fk}");
        } 
       
@@ -176,14 +180,27 @@
           var category = $("select#category").val();
           var searchname = $("input#keyword").val();
           // 클릭된 것이 무엇인지 알아오는 변수
-          var sort = $(this).attr("value");
+          var sort = $(this).attr("id");
           location.href="<%= ctxPath%>/search/SearchPage.neige?pdgender="+gender+"&pdcategory_fk="+category+"&searchname="+searchname+"&sort="+sort;         
        });
       
       
-       // 정렬 클릭한 것 bold처리하기 -------------- 수정필요
-       if( ${requestScope.sort != null} ) {
-          $("li.sort").val("${requestScope.sort}"); 
+       // 정렬 클릭한 것 bold처리하기 
+	       if( ${requestScope.sort != null} ) {
+	    	   var sort = "${requestScope.sort}"; 
+	            
+	    	    if(sort == "sortNewProduct") {
+	 				$("li#sortNewProduct").css('font-weight','bold');
+			 	}
+			 	else if(sort == "sortLowPrice") {
+			 		 $("li#sortLowPrice").css('font-weight','bold');
+			 	}
+			 	else if(sort == "sortHighPrice") {
+			 		 $("li#sortHighPrice").css('font-weight','bold');
+			 	}
+			 	else if(sort == "sortBestProduct") {
+			 		 $("li#sortBestProduct").css('font-weight','bold');
+			 	}
        }
        
        
@@ -195,7 +212,6 @@
 		if("${sizePerPage}" != "" ) {
 			$("select#sizePerPage").val("${sizePerPage}");
 		}
-       
     
    }); // end of $(document).ready()------------------------
    
@@ -205,20 +221,22 @@
 		frm.method = "GET";
 		frm.submit();
 	}
-   
+
+	 
+
 </script>
 
 
 <%-- 검색 디스플레이 --%>
-<div id="contents">
+<div id="searchArea">
    <div class="titleArea">SEARCH ITEMS</div>
    <div class="searchBox">
    <fieldset>
       <div class="genderRadio">
-         <span id="gender">성별</span>
-         <div id="all" ><label for="0">전체</label><input name="gender" type="radio" id="0" value="0" checked="checked"></div>
-         <div id="women"><label for="2">여성</label><input name="gender" type="radio" id="2" value="2"></div>
-         <div id="men"><label for="1">남성</label><input name="gender" type="radio" id="1" value="1"></div>
+         <span id="gender" style="margin: 0 30px 0 0 ">성  별</span>
+	         <div id="all" ><label for="0">전체</label><input name="gender" type="radio" id="0" value="0" checked="checked"></div>
+	         <div id="women"><label for="2">여성</label><input name="gender" type="radio" id="2" value="2"></div>
+	         <div id="men"><label for="1">남성</label><input name="gender" type="radio" id="1" value="1"></div>
       </div>
       <div class="item">
          <div class="category">
@@ -261,16 +279,16 @@
    <div class="orderBy">
       <ul class="orderBy">
          <li class="sort" value="sortNewProduct" id="sortNewProduct">
-            <a href="javascript:void(0);"> 신상품순 </a> <span class="delimiter">&#124;</span> 
+            <a href="javascript:void(0);" style="color: black;">신상품순</a><span class="delimiter">&#124;</span> 
          </li>
          <li class="sort" value="sortLowPrice" id="sortLowPrice">
-            <a href="javascript:void(0);"> 낮은가격순 </a> <span class="delimiter">&#124;</span> 
+            <a href="javascript:void(0);" style="color: black;">낮은가격순</a><span class="delimiter">&#124;</span> 
          </li>
          <li class="sort" value="sortHighPrice" id="sortHighPrice">
-            <a href="javascript:void(0);"> 높은가격순 </a> <span class="delimiter">&#124;</span> 
+            <a href="javascript:void(0);" style="color: black;">높은가격순</a><span class="delimiter">&#124;</span> 
          </li>
          <li class="sort" value="sortBestProduct" id="sortBestProduct">
-            <a href="javascript:void(0);"> 인기상품순 </a> 
+            <a href="javascript:void(0);" style="color: black;">인기상품순</a> 
          </li>
       </ul>
    </div>
@@ -287,7 +305,7 @@
                      <div class="slideshow-container">
                         <div class="productImg" style="cursor:pointer">
                         <%-- <img src="기본 이미지 주소" onmouseover="this.src='마우스 오버 상태의 이미지 주소'" onmouseout="this.src='기본 이미지 주소'"> --%>
-                          <img style="cursor:pointer" onclick="javascript:window.open('<%= ctxPath%>/notice/view.neige?pdno=${pvo.pdno}', '_self')" src="<%= ctxPath%>/images/${pvo.pdimage1}" onmouseover="this.src='<%= ctxPath%>/images/${pvo.pdimage2}'" onmouseout="this.src='<%= ctxPath%>/images/${pvo.pdimage1}'">
+                          <img style="cursor:pointer" onclick="javascript:window.open('<%= ctxPath%>/ProductDetail.neige?pdno=${pvo.pdno}', '_self')" src="<%= ctxPath%>/images/${pvo.pdimage1}" onmouseover="this.src='<%= ctxPath%>/images/${pvo.pdimage2}'" onmouseout="this.src='<%= ctxPath%>/images/${pvo.pdimage1}'">
                         </div>
                  	 </div>
                      <div class = "discription">
