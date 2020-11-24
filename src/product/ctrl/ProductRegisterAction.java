@@ -24,6 +24,8 @@ public class ProductRegisterAction extends AbstractController {
 		HttpSession session = request.getSession();
 		MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
 		
+		InterProductDAO pdao = new ProductDAO();
+		
 		// System.out.println("로그인 정보 -==> " + loginuser.getUserid());
 		
 		if( loginuser != null && "admin".equals(loginuser.getUserid())) {
@@ -34,6 +36,7 @@ public class ProductRegisterAction extends AbstractController {
 			if("GET".equalsIgnoreCase(method)) {
 				
 				super.setViewPage("/WEB-INF/product/productRegister.jsp");
+				
 				
 			}
 			else {
@@ -85,11 +88,9 @@ public class ProductRegisterAction extends AbstractController {
 				String texture = mtrequest.getParameter("texture");
 				String pdgender = mtrequest.getParameter("pdgender");
 				
-				String pcolores = mtrequest.getParameter("pcolor");
-				String psizees = mtrequest.getParameter("psize");
+				String pcolores = mtrequest.getParameter("pcolor").trim().replace(" ", "");
+				String psizees = mtrequest.getParameter("psize").trim().replace(" ", "");
 				
-				
-				InterProductDAO pdao = new ProductDAO();
 				
 				int pdno = pdao.getPnumOfProduct(); // 제품번호 채번해오는 메소드
 				
@@ -148,6 +149,20 @@ public class ProductRegisterAction extends AbstractController {
 				String[] pcolors = pcolores.split(","); // 색상을 배열로 
 				String[] psizes = psizees.split(",");  //  사이즈를 배열로 
 				
+				// 배열을 리스트로 만들기
+				// 1. 색상 배열 => 색상 리스트
+				List<String> pcolorList = new ArrayList<>();
+				
+				Collections.addAll(pcolorList, pcolors);
+				
+				System.out.println("색상 리스트 => " + pcolorList);
+				
+				// 2. 사이즈 배열 => 사이즈 리스트
+				List<String> psizeList = new ArrayList<>();
+				Collections.addAll(psizeList, pcolors);
+				
+				System.out.println("사이즈 리스트 => " + psizeList);
+				
 				// pdno, 색상, 사이즈 Map에 담겨서 넘기자~~~~~
 				Map<String, Object> paraMap = new HashMap<String, Object>();
 				
@@ -160,7 +175,9 @@ public class ProductRegisterAction extends AbstractController {
 				for(int i=0; i<pcolors.length; i++) {
 					
 					// 색상과 사이즈를 insert하는 메소드 
-					productInfo = pdao.product_info_insert(paraMap);
+					// productInfo = pdao.product_info_insert(paraMap);
+					productInfo = pdao.product_info_insert(pdno, pcolorList.get(i), psizeList.get(i));
+					
 					
 				}
 				
