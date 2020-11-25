@@ -2042,6 +2042,276 @@ public class ProductDAO implements InterProductDAO {
 	   }
 	
 	
+	// 상품 업데이트 메소드(update) (JIEUN)
+	@Override
+	public int productUpdate(ProductVO pvo) throws SQLException  {
+		
+		int result = 0;
+		
+		try {
+			
+			conn = ds.getConnection();
+			
+			
+			// (pdno, pdname, pdcategory_fk, pdimage1, pdimage2, pdqty, price, saleprice, pdcontent, point, texture, pdgender)
+			
+			// String sql = " UPDATE tbl_product SET pdcategory_fk = ?, pdname = ? ";
+			String sql = " UPDATE tbl_product "
+					   + " SET pdcategory_fk = ?, pdname = ? , pdqty = ?, price = ?, saleprice = ?, "
+					   + " pdcontent = ?, texture = ?, pdgender = ? "
+					   + " where pdno = ? ";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, pvo.getPdcategory_fk());
+			pstmt.setString(2, pvo.getPdname());
+			pstmt.setInt(3, pvo.getPdqty());
+			pstmt.setInt(4, pvo.getPrice());
+			pstmt.setInt(5, pvo.getSaleprice());
+			pstmt.setString(6, pvo.getPdcontent());
+			pstmt.setString(7, pvo.getTexture());
+			pstmt.setString(8, pvo.getPdgender());
+			pstmt.setInt(9, pvo.getPdno());
+			
+			
+			/*
+			if(  !"".equals(pvo.getPdimage1()) ||  !"".equals(pvo.getPdimage2())) {
+				// 제품이미지1, 2가 null값이 아닌 경우에 
+				sql += " , pdimage1 = ?, pdimage2 = ?, pdqty = ?, price = ?, saleprice = ?, pdcontent = ?, texture = ?, pdgender = ? ";
+			}
+			else {
+				sql += " , pdqty = ?, price = ?, saleprice = ?, pdcontent = ?, texture = ?, pdgender = ? ";
+			}
+			
+			sql += " where pdno = ? ";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			if( !"".equals(pvo.getPdimage1()) ||  !"".equals(pvo.getPdimage2())) {
+				// 제품이미지1, 2가 null값이 아닌 경우에 
+				pstmt.setString(1, pvo.getPdcategory_fk());
+				pstmt.setString(2, pvo.getPdname());
+				pstmt.setString(3, pvo.getPdimage1());
+				pstmt.setString(4, pvo.getPdimage2());
+				pstmt.setInt(5, pvo.getPdqty());
+				pstmt.setInt(6, pvo.getPrice());
+				pstmt.setInt(7, pvo.getSaleprice());
+				pstmt.setString(8, pvo.getPdcontent());
+				pstmt.setString(9, pvo.getTexture());
+				pstmt.setString(10, pvo.getPdgender());
+				pstmt.setInt(11, pvo.getPdno());
+				
+			}
+			else {
+				
+				pstmt.setString(1, pvo.getPdcategory_fk());
+				pstmt.setString(2, pvo.getPdname());
+				pstmt.setInt(3, pvo.getPdqty());
+				pstmt.setInt(4, pvo.getPrice());
+				pstmt.setInt(5, pvo.getSaleprice());
+				pstmt.setString(6, pvo.getPdcontent());
+				pstmt.setString(7, pvo.getTexture());
+				pstmt.setString(8, pvo.getPdgender());
+				pstmt.setInt(9, pvo.getPdno());
+				
+			}
+			
+			*/
+			
+			result = pstmt.executeUpdate();
+			
+			
+		} finally {
+			close();
+		}
+		
+		return result;
+	}
+	
+	// 색상, 사이즈 업데이트 메소드(update) (JIEUN)
+	@Override
+	public int productInfoUpdate(String pdno, String pcolor, String psize) throws SQLException {
+		
+		
+		int productInfo = 0;
+		
+		try {
+			
+			conn = ds.getConnection(); 
+			
+
+			String sql = " UPDATE tbl_product_info "
+					   + " SET pcolor = ?, psize = ? " 
+					   + " where pinfono = ? ";
+			
+			pstmt = conn.prepareStatement(sql);		
+			
+			pstmt.setString(1, pcolor);
+			pstmt.setString(2, psize);
+			pstmt.setInt(3, Integer.parseInt(pdno));
+			
+			productInfo = pstmt.executeUpdate();
+			
+		} finally {
+			close();
+		}		
+		
+		return productInfo;
+		
+	}
+	
+	// pdno에 해당하는 제품 삭제 메소드
+	@Override
+	public int productDelete(String pdno) throws SQLException {
+		
+		int result = 0;
+		
+		try {
+		
+			conn = ds.getConnection(); 
+			
+			String sql = " delete from tbl_product "
+					   + " where pdno = ? ";
+			
+			pstmt = conn.prepareStatement(sql);		
+			
+			pstmt.setInt(1, Integer.parseInt(pdno));
+			
+			result = pstmt.executeUpdate();
+			
+		} finally {
+			close();
+		}
+		
+		return result;
+	}
+	
+	// pdno에 해당하는 추가첨부파일 삭제 메소드 (JIEUN)
+	@Override
+	public int pdImgDelete(String pdno) throws SQLException {
+
+		int result = 0;
+		
+		try {
+		
+			conn = ds.getConnection(); 
+
+			String sql = " delete from tbl_product_imagefile "
+					   + " where pdno_fk = ? ";
+			
+			pstmt = conn.prepareStatement(sql);		
+			
+			pstmt.setInt(1, Integer.parseInt(pdno));
+			
+			result = pstmt.executeUpdate();
+			
+		} finally {
+			close();
+		}
+		
+		return result;
+		
+	}
+	
+	// pdno에 해당하는 색상과 사이즈 삭제 메소드 (JIEUN)
+	@Override
+	public int pdInfoDelete(String pdno) throws SQLException {
+
+		int result = 0;
+		
+		try {
+
+			conn = ds.getConnection(); 
+
+			String sql = " delete from tbl_product_info "
+					   + " where pdno_fk = ? ";
+			
+			pstmt = conn.prepareStatement(sql);		
+			
+			pstmt.setInt(1, Integer.parseInt(pdno));
+			
+			result = pstmt.executeUpdate();
+			
+		} finally {
+			close();
+		}
+		
+		return result;
+		
+	}
+	
+	// 추가 이미지 파일은 있을 수도 있고 없을 수도 있기 때문에 select로 개수를 알아오는 메소드(JIEUN)
+	@Override
+	public int pdImgSelected(String pdno) throws SQLException {
+		
+
+		int result = 0;
+		
+		try {
+			
+			conn = ds.getConnection();
+			
+			String sql = " select count(*) "+
+					     " from tbl_product_imagefile "+
+					     " where pdno_fk = ? ";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, Integer.parseInt(pdno));
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				result = rs.getInt(1);
+			}
+			
+			
+		} finally {
+			close();
+		}
+		
+		return result;		
+		
+		
+	}
+	
+	// 색상, 사이즈 일련번호 구해오기 (JIEUN)
+	@Override
+	public 	HashMap<String, String> pdinfoseqSelect(String pdno) throws SQLException {
+		
+		HashMap<String, String> infoMap = new HashMap<String, String>();
+		
+		try {
+			
+			conn = ds.getConnection();
+			
+			String sql = " select rownum as rno, pinfono "+
+					     " from tbl_product_info "+
+					     " where pdno_fk=? ";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, Integer.parseInt(pdno));
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				
+				String rno = String.valueOf(rs.getInt(1));
+				String pinfono = String.valueOf(rs.getInt(2));
+				
+				infoMap.put(rno, pinfono);
+				
+			}
+			
+			
+		} finally {
+			close();
+		}
+		
+		return infoMap;	
+		
+	}	
+	
+	
 		////////////////////////////////////////////////////////////김민아//////////////////////////////////////////////////////////////////////
 		
 		
