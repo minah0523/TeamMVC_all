@@ -20,20 +20,32 @@
 }
 
 button.btns {
-	margin-top: 80px;
+	margin-top: 50px;
 	margin-bottom: 80px;
 }
 
-table, tr, td {
-	border: 1px solid black;
+.order_row, .order_title{
+border: 1px solid #0A6BC6; 
+border-collapse: collapse;
 }
 
-.tbl_data {
-background-color: #F3F8FD; 
-padding-top:5px; 
-padding-bottom:5px; 
-border-top: 2px solid #0A6BC6; 
-border-bottom: 2px solid #0A6BC6;
+.order_title, .row_title {
+	padding: 10px;
+	background-color: #F3F8FD;
+}
+
+div.order_title {
+	float:left;
+}
+
+.row_title {
+	text-align: left;
+	border-right: 1px solid #0A6BC6;
+}
+
+.row_data {
+	text-align: left;
+	padding-left: 10px;
 }
 
 </style>
@@ -48,30 +60,36 @@ border-bottom: 2px solid #0A6BC6;
 				<p>저희 쇼핑몰을 이용해주셔서 감사합니다.</p>
 			</div>
 
-			<h3 class="tbl_data" align="left">주문내역</h3>
-			<h4 align="left">주문 감사합니다.</h4>
-			<div class="mainimage">
-				<table id="main_content">
-					<tr align="left"> 
-						<td>주문완료</td>
-					</tr>
-					<tr align="left"> 
-						<td></td>
-					</tr>
-					<tr align="left"> 
-						<td></td>
-					</tr>
-					<tr align="left"> 
-						<td></td>
-					</tr>
-				</table>
+			<h3 class="order_title" align="left">주문내역</h3>
+			<h4 align="left">&nbsp;주문 감사합니다.</h4>
+			<div class="main_order">
+				<div>
+					<div class="order_row">
+						<div class="row_title" style="display: inline-block; width: 30%;">주문번호</div> 
+						<div class="row_data" style="display: inline-block; width: 69%" id="orderno">${ovo.odrcode}</div>
+					</div>
+					<div class="order_row">
+						<div class="row_title" style="display: inline-block; width: 30%;">주문자</div> 
+						<div class="row_data" style="display: inline-block; width: 69%" id="amount">${ovo.userid_fk}</div>
+					</div>
+					<div class="order_row">
+						<div class="row_title" style="display: inline-block; width: 30%;">총 가격</div> 
+						<div class="row_data" style="display: inline-block; width: 69%" id="orderday">${ovo.odrtotalprice}</div>
+					</div>
+					<div class="order_row">
+						<div class="row_title" style="display: inline-block; width: 30%;">적립금액</div> 
+						<div class="row_data" style="display: inline-block; width: 69%" id="addPoint">${ovo.odrtotalpoint}</div>
+					</div>
+					<div class="order_row">
+						<div class="row_title" style="display: inline-block; width: 30%;">주문일시</div> 
+						<div class="row_data" style="display: inline-block; width: 69%" id="addPoint">${ovo.odrdate}</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 	<button type="button" id="btnHome" class="btn btn-warning btns" onclick="location.href='http://localhost:9090/TeamMVC/TeamHomePage.neige'">HOME</button>
-	<button type="button" id="btnLogin" class="btn btn-warning btns" onclick="location.href='http://localhost:9090/TeamMVC/login/loginPage.neige'">Login</button>
 	<div></div>
-
 </body>
 </html>
 
