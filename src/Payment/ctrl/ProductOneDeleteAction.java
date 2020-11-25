@@ -16,8 +16,19 @@ public class ProductOneDeleteAction extends AbstractController {
 		String pdno = request.getParameter("pdno");
 		String userid_fk = request.getParameter("userid_fk");
 		
+		System.out.println(pdno);
+		System.out.println(userid_fk);
+		
 		int n = pdao.productOneDelete(pdno,userid_fk);
 		
+		String message = "";
+		
+		if(n == 1) {
+			message = "삭제성공";
+		}
+		
+		super.setRedirect(false);
+		super.setViewPage("/WEB-INF/jsonview.jsp");
 		
 	}
 

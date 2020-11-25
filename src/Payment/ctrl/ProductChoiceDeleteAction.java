@@ -25,6 +25,11 @@ public class ProductChoiceDeleteAction extends AbstractController {
 			int pdno = Integer.parseInt(arrPdno[i]); 
 			pdao.productChoiceDelete(pdno, userid_fk);
 		}
+		
+		String message = "";
+		
+		super.setRedirect(false);
+		super.setViewPage("/WEB-INF/jsonview.jsp");
 		 
 		
 	}

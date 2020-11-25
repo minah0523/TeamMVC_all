@@ -20,11 +20,8 @@ public class PaymentSuccessAction extends AbstractController {
 		String pdnoes = request.getParameter("pdnoes");
 		String userid_fk = request.getParameter("userid_fk");
 		String finalPrice = request.getParameter("finalPrice");
-		String usePoint = request.getParameter("usePoint");
-		
+		String addPoint = request.getParameter("addPoint");
 		String amount = request.getParameter("amount");
-		
-		int addPoint = 0;
 		
 		//addPoint = (int)(Integer.parseInt(finalPrice)/100);
 		
@@ -33,7 +30,7 @@ public class PaymentSuccessAction extends AbstractController {
 		paraMap.put("pdnoes", pdnoes);
 		paraMap.put("userid_fk", userid_fk);
 		paraMap.put("finalPrice", finalPrice);
-		paraMap.put("usePoint", usePoint);
+		paraMap.put("addPoint", addPoint);
 		
 		InterProductDAO pdao = new ProductDAO();
 		
