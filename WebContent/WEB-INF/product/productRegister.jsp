@@ -329,7 +329,7 @@ function goReset() {
    <table id="tblProductRegister">
       <thead>
       <tr>
-         <th colspan="2" id="th" style=" background-color: white; padding-top: 0px;" > 제품등록 </th>
+         <th colspan="2" id="th" style=" background-color: white; padding-top: 0px;" > 상품등록 </th>
       </tr>
       </thead>
       <tbody>
@@ -414,7 +414,7 @@ function goReset() {
 	         <td class = "titles" style="width: 20%;">추가제품이미지&nbsp;</td>
 	         <td style="width: 80%; text-align: left;">
 	         	 <span>
-	             	<input type="file" name="plusPdimage" id="plusPdimage" class="requiredInfo" />
+	             	<input type="file" name="plusPdimage" id="plusPdimage" />
 	             </span>
 	         </td> 
 	      </tr>
@@ -435,7 +435,7 @@ function goReset() {
 	      <tr>
 	         <td colspan="2" style="line-height: 30px; border-bottom: hidden;">
 	            <span>
-	            	<button type="button" id="btnRegister" style="margin: 20px 0px 20px 450px; border: none; border-radius: 5px; width: 100px; align:center; background-color: #BCA897; color:white;" onClick="goProductRegister();">등록하기</button>
+	            	<button type="button" id="btnRegister" style="margin: 20px 0px 20px 400px; border: none; border-radius: 5px; width: 100px; align:center; background-color: #BCA897; color:white;" onClick="goProductRegister();">등록하기</button>
 	            	<button type="button" id="reset" style="margin-left: 20px; border: none; border-radius: 5px; width: 100px; align:center; background-color: #BCA897; color:white;" onClick="goReset();">초기화</button> <!-- backgorund-color : #555 -->
 	            </span> 
 	         </td>
