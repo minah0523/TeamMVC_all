@@ -54,6 +54,28 @@ public interface InterProductDAO {
 	   // 관리자페이지의 상품 관리 리스트 중 하나 클릭 했을때 pdno로 데이터를 받아서 추가 이미지 파일 가져오기  (JIEUN)
 	   ProductImageFileVO addProductImageFileDetail(String pdno) throws SQLException;      
 	
+	// 상품 업데이트 메소드(update) (JIEUN)
+	int productUpdate(ProductVO pvo) throws SQLException;
+	
+	// 색상, 사이즈 업데이트 메소드(update) (JIEUN)
+	int productInfoUpdate(String pdno, String pcolor, String psize) throws SQLException;
+	
+	// pdno에 해당하는 제품 삭제 메소드 (JIEUN)
+	int productDelete(String pdno) throws SQLException;	
+	
+	// pdno에 해당하는 추가첨부파일 삭제 메소드 (JIEUN)
+	int pdImgDelete(String pdno) throws SQLException;	
+	
+	// pdno에 해당하는 색상과 사이즈 삭제 메소드 (JIEUN)
+	int pdInfoDelete(String pdno) throws SQLException;		
+
+	// 추가 이미지 파일은 있을 수도 있고 없을 수도 있기 때문에 select로 개수를 알아오는 메소드(JIEUN)
+	int pdImgSelected(String pdno) throws SQLException;
+	
+	// 색상, 사이즈 일련번호 구해오기 (JIEUN)
+	HashMap<String, String> pdinfoseqSelect(String pdno) throws SQLException;
+	
+	
 	// search페이지에 보여지는 상품이미지파일명을 모두 조회(select)하는 메소드 (MINA)
 	List<ProductVO> searchProduct(Map<String, String> paraMap) throws SQLException;
 
