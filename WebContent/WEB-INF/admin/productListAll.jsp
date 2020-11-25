@@ -276,12 +276,20 @@
 			
 			// 클릭한곳 :  this , 클릭한곳의 클래스가 pdno인 것을 얻어 오자
 			var pdno = $(this).children(".pdno").text();
-			// alert("test pdno" + pdno);
+			alert("test pdno" + pdno);
 			
 			// pdno 를 아래 경로로 보내자(한사람에 대한 상세 정보를 보여주는 페이지로 이동)
-			location.href = "/TeamMVC/admin/productUpdate.neige?pdno="+pdno; // userid+"&goBackURL=${goBackURL}";
+			// location.href = "/TeamMVC/admin/productUpdate.neige?pdno="+pdno; // userid+"&goBackURL=${goBackURL}";
+			location.href = "/TeamMVC/admin/productOneView.neige?pdno="+pdno; // userid+"&goBackURL=${goBackURL}";
 		});
-				
+		
+		
+		$("div#btnDelete").children().click(function(){
+			alert("클릭");
+			
+			location.href = "<%= ctxPath %>/admin/productDelete.neige";
+			
+		});
 		
 	}); // end of $(document).ready(function(){})-------------------------------
 	
@@ -305,6 +313,7 @@
 		// select태그의 자식중 option태그의 첫번째를 찾아서 selected 속성 부여해준다. 
 		$("select").find('option:first').attr('selected', 'selected');
 	}
+	
 
 </script>
 
@@ -374,9 +383,11 @@
 		<table id = "prodListTable" class="table " style="text-align: center; border: solid 0px white;"> <%-- table-striped --%>
 			<thead id = "tableHead">
 				<tr>
+					<!--  
 					<th>
 						<input type="checkbox" name="allCheckBox" />
 					</th>
+					-->
 					<th>상품번호</th>
 					<th>카테고리명</th>
 					<th>상품명</th>
@@ -410,22 +421,24 @@
 				--%>
 				<c:forEach var="adminProdvo" items="${adminprodList}" varStatus="status">
 					<tr class="productInfo" style="cursor:pointer" >
+						<!-- 
 						<td>
 							<input type= "checkbox" name="productList${status.index}" />
 						</td>
-						<td class="pdno">${adminProdvo.pdno}</td>
-						<td>${adminProdvo.catevo.cgname}</td>
-						<td>${adminProdvo.pdname}</td>
-						<td>${adminProdvo.pdqty}</td>
-						<td><fmt:formatNumber value="${adminProdvo.price}" pattern="###,###" />원</td>
-						<td>${adminProdvo.pdinputdate}</td>	
+						 -->
+						<td class="pdno pdInfoList">${adminProdvo.pdno}</td>
+						<td class="pdInfoList">${adminProdvo.catevo.cgname}</td>
+						<td class="pdInfoList">${adminProdvo.pdname}</td>
+						<td class="pdInfoList">${adminProdvo.pdqty}</td>
+						<td class="pdInfoList"><fmt:formatNumber value="${adminProdvo.price}" pattern="###,###" />원</td>
+						<td class="pdInfoList">${adminProdvo.pdinputdate}</td>	
 						<c:if test="${adminProdvo.pdgender eq '1'}">
-							<td style = "border-right: hidden;">남자</td>
+							<td class="pdInfoList" style = "border-right: hidden;">남자</td>
 						</c:if>
 						
 						<c:if test="${adminProdvo.pdgender eq '2'}">
-							<td style = "border-right: hidden;">여자</td>
-						</c:if>
+							<td class="pdInfoList" style = "border-right: hidden;">여자</td>
+						</c:if> 
 					</tr>
 				</c:forEach> 				
 			</tbody>
@@ -442,9 +455,11 @@
 		<div class ="btnCUD">
 			<a href="<%= ctxPath %>/product/productRegister.neige" class="btn btn-primary pull-right">등록</a>
 		</div>
-		<div class ="btnCUD">
-			<a href="<%= ctxPath %>/admin/productDelete.neige" class="btn btn-primary pull-right">삭제</a>
+		<!-- 
+		<div class ="btnCUD" id = "btnDelete">
+			<a href="javascript:void(0);" class="btn btn-primary pull-right">삭제</a>
 		</div>
+		 -->
 	</div>
 </div>
 
