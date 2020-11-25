@@ -116,5 +116,8 @@ public interface InterProductDAO {
 
 	// 주문이 완료된뒤 총가격, 총 적립 포인트 등을 주문 테이블에 insert하는 메서드(동휘)
 	String RecordOrder(Map<String, String> paraMap) throws SQLException;
+
+	// 주문완료페이지에 완료정보를 뿌려주기 위한 메서드(동휘)
+	OrderVO getOrderInfo(String userid) throws SQLException;
 	
 }
