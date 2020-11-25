@@ -19,7 +19,6 @@ public interface InterProductDAO {
 	   // 카테고리 목록 보여주는 메소드(코트, 자켓, 점퍼, 무스탕, 가디건)  (JIEUN)
 	   List<CategoryVO> CategoryListSelectAll() throws SQLException;
 
-<<<<<<< HEAD
 	   // 카테고리 목록 클릭시 카테고리 코드에 따라 조회 및 정렬하는 메소드  (JIEUN)
 	   List<ProductVO> categoryProducClickSelectAll(Map<String, String> paraMap) throws SQLException;
 	   
@@ -54,38 +53,6 @@ public interface InterProductDAO {
 	   
 	   // 관리자페이지의 상품 관리 리스트 중 하나 클릭 했을때 pdno로 데이터를 받아서 추가 이미지 파일 가져오기  (JIEUN)
 	   ProductImageFileVO addProductImageFileDetail(String pdno) throws SQLException;      
-=======
-	// 카테고리 목록 클릭시 카테고리 코드에 따라 조회 및 정렬하는 메소드  (JIEUN)
-	List<ProductVO> categoryProducClickSelectAll(Map<String, String> paraMap) throws SQLException;
-	
-	// ============= 상품 등록 하는 메소드  ==================== //
-	// tbl_prodcut에 상품을 등록하는(insert) 메소드(JIEUN)
-	int ProdutcRegisterAll(ProductVO product) throws SQLException;	
-		
-	// 제품번호 채번해오는 메소드(JIEUN)
-	int getPnumOfProduct() throws SQLException;
-	
-	// 추가 이미지 파일 insert하는 메서드(JIEUN)
-	int product_imagefile_Insert(int pdno, String plusPdimage) throws SQLException;
-	
-	// 색상과 사이즈를 insert하는 메소드(JIEUN)
-	int product_info_insert(int pdno, String pcolor, String psize) throws SQLException;
-	
-	// 관리자 페이지에서 상품(번호, 카테고리, 상품명, 재고, 가격, 성별) 리스트 가져오는(select) 메소드(JIEUN)
-	List<ProductVO> adminProductListAll() throws SQLException;
-	
-	// 관리자 페이지에서 상품(번호, 카테고리, 상품명, 재고, 가격, 성별) 리스트 가져오는(select) 메소드(검색결과도 같이 조회 할 수 있도록)(JIEUN)
-	List<ProductVO> adminProductListAll(Map<String, String> paraMap) throws SQLException;
-	
-	// 페이징처리를 위해서 총 제품 개수와 페이지 개수 알아오기(select) (JIEUN)
-	int getTotalPage(Map<String, String> paraMap) throws SQLException;	
-	
-	// 관리자페이지의 상품 관리 리스트 중 하나 클릭 했을때 pdno로 데이터를 받아서 상품정보 조회해서 받아오자(JIEUN)
-	ProductVO adminProductDetail(String pdno) throws SQLException;	
-	
-	// 관리자페이지의 상품 관리 리스트 중 하나 클릭 했을때 pdno로 데이터를 받아서 색상, 사이즈 가져오기 (JIEUN)
-	List<ProductInfoVO> productInfoDetail(String pdno) throws SQLException;	
->>>>>>> 642543c879f749d082a1e969d8b35798f725c4b9
 	
 	// search페이지에 보여지는 상품이미지파일명을 모두 조회(select)하는 메소드 (MINA)
 	List<ProductVO> searchProduct(Map<String, String> paraMap) throws SQLException;
@@ -97,11 +64,7 @@ public interface InterProductDAO {
 	List<String> selectProductSize(String pdno) throws SQLException;
 
 	// 페이징처리를 위해서 전체회원에 대한 총 제품 개수와 페이지 개수 알아오기(select) (MINA)
-<<<<<<< HEAD
 	Map<String, String> getTotal(Map<String, String> paraMap) throws SQLException;
-=======
-	Map<String, String> getTotal(Map<String, String> paraMap) throws SQLException;	
->>>>>>> 642543c879f749d082a1e969d8b35798f725c4b9
 	
 	// 승의
 	/*
@@ -127,15 +90,11 @@ public interface InterProductDAO {
 
 	// ProductVO selectOneProductByPnum(String pdno) throws SQLException;
 	
-<<<<<<< HEAD
    // Ajax 를 이용한 특정 제품의 상품후기를 입력(insert)하기
    int addComment(PurchaseReviewsVO previewvo) throws SQLException;
 
    // Ajax 를 이용한 특정 제품의 상품후기를 조회(select)하기
    List<PurchaseReviewsVO> commentList(String fk_pdno) throws SQLException;
-=======
-	// 승의 끝
->>>>>>> 642543c879f749d082a1e969d8b35798f725c4b9
 	
 	// 승의 끝
 	
