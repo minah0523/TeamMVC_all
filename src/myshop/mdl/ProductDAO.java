@@ -2808,225 +2808,274 @@ public class ProductDAO implements InterProductDAO {
 
 
 	///////////////////////////////////////김동휘/////////////////////////////////////
-
-		// 장바구니 버튼을 누를경우 상품의 리스트를 받아온뒤 화면상에 출력 (동휘)
-		@Override
-		public List<ProductVO> getCartList(String userid) throws SQLException {
+	
+	// 장바구니 버튼을 누를경우 상품의 리스트를 받아온뒤 화면상에 출력 (동휘)
+	@Override
+	public List<ProductVO> getCartList(String userid) throws SQLException {
+		
+		List<ProductVO> cartList = new ArrayList<ProductVO>();
+		
+		try {
+			conn = ds.getConnection(); // DBCP에서 connection 받아오기
 			
-			List<ProductVO> cartList = new ArrayList<ProductVO>();
+			String sql = "select pd.pdno, pdname, PDCATEGORY_FK, PDIMAGE1, PDIMAGE2, pdqty, price, saleprice, pdcontent, point, pdinputdate, texture, pdgender, w.userid_fk, w.pinfono, w.pqty, w.pcolor, w.psize\n"+
+					"from\n"+
+					"(\n"+
+					"select v.userid_fk, v.pinfono, v.pqty, pdno_fk, pcolor, psize\n"+
+					"from\n"+
+					"(\n"+
+					"select cartno, userid_fk, pinfono, pqty, registerday\n	"+
+					"from TBL_cart \n"+
+					"where userid_fk = ?\n"+
+					")v inner join tbl_product_info p\n"+
+					"on v.pinfono = p.PINFONO\n"+
+					")w inner join tbl_product pd\n"+
+					"on w.pdno_fk = pd.pdno";
 			
-			try {
-				conn = ds.getConnection(); // DBCP에서 connection 받아오기
-				
-				String sql = "select pd.pdno, pdname, PDCATEGORY_FK, PDIMAGE1, PDIMAGE2, pdqty, price, saleprice, pdcontent, point, pdinputdate, texture, pdgender, w.userid_fk, w.pinfono, w.pqty, w.pcolor, w.psize\n"+
-						"from\n"+
-						"(\n"+
-						"select v.userid_fk, v.pinfono, v.pqty, pdno_fk, pcolor, psize\n"+
-						"from\n"+
-						"(\n"+
-						"select cartno, userid_fk, pinfono, pqty, registerday\n	"+
-						"from TBL_cart \n"+
-						"where userid_fk = ?\n"+
-						")v inner join tbl_product_info p\n"+
-						"on v.pinfono = p.PINFONO\n"+
-						")w inner join tbl_product pd\n"+
-						"on w.pdno_fk = pd.pdno";
-				
-				pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
-				
-				pstmt.setString(1, userid);
-				
-				rs = pstmt.executeQuery(); // select 되어진 결과를 resultSet에 받는다.
-				
-				while(rs.next()) {
-					ProductVO pdvo = new ProductVO();
-					
-					pdvo.setPdno(rs.getInt(1));
-					pdvo.setPdname(rs.getString(2));
-					pdvo.setPdcategory_fk(rs.getString(3));
-					pdvo.setPdimage1(rs.getString(4));
-					pdvo.setPdimage2(rs.getString(5));
-					pdvo.setPdqty(rs.getInt(6));
-					pdvo.setPrice(rs.getInt(7));
-					pdvo.setSaleprice(rs.getInt(8));
-					pdvo.setPdcontent(rs.getString(9));
-					pdvo.setPoint(rs.getInt(10));
-					pdvo.setPdinputdate(rs.getString(11));
-					pdvo.setTexture(rs.getString(12));
-					pdvo.setPdgender(rs.getString(13));
-					
-					cartList.add(pdvo);
-				} // end of while(rs.next()) ---------------------------
-			} finally {
-				close();
-			}
+			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
 			
-			return cartList;
-		}
-
-		@Override
-		public void productAllDelete(int pdno, String userid_fk) throws SQLException {
+			pstmt.setString(1, userid);
 			
-			try {
-				conn = ds.getConnection(); // DBCP에서 connection 받아오기
-				
-				String sql = " delete from TBL_CART where userid_fk = ? and pdno_fk = ? ";
-				
-				pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
-				
-				//pstmt.setString(1, userid_fk);
-				pstmt.setInt(2, pdno);
-				pstmt.setString(1, "siasia");
-				
-				int n = pstmt.executeUpdate();
-				
-			} finally {
-				close();
-			}
+			rs = pstmt.executeQuery(); // select 되어진 결과를 resultSet에 받는다.
 			
+			while(rs.next()) {
+				ProductVO pdvo = new ProductVO();
+				
+				pdvo.setPdno(rs.getInt(1));
+				pdvo.setPdname(rs.getString(2));
+				pdvo.setPdcategory_fk(rs.getString(3));
+				pdvo.setPdimage1(rs.getString(4));
+				pdvo.setPdimage2(rs.getString(5));
+				pdvo.setPdqty(rs.getInt(6));
+				pdvo.setPrice(rs.getInt(7));
+				pdvo.setSaleprice(rs.getInt(8));
+				pdvo.setPdcontent(rs.getString(9));
+				pdvo.setPoint(rs.getInt(10));
+				pdvo.setPdinputdate(rs.getString(11));
+				pdvo.setTexture(rs.getString(12));
+				pdvo.setPdgender(rs.getString(13));
+				
+				cartList.add(pdvo);
+			} // end of while(rs.next()) ---------------------------
+		} finally {
+			close();
 		}
 		
-		// 상품 개별삭제 버튼을 누를경우 유저의 ID와 해당 제품의 번호를 받아와 DB테이블에서 삭제해주는 메서드
-		@Override
-		public int productOneDelete(String pdno, String userid_fk) throws SQLException {
-			int result = 0;
+		return cartList;
+	}
+	
+	@Override
+	public void productAllDelete(int pdno, String userid_fk) throws SQLException {
+		
+		try {
+			conn = ds.getConnection(); // DBCP에서 connection 받아오기
 			
-			try {
-				conn = ds.getConnection(); // DBCP에서 connection 받아오기
-				
-				String sql = " delete from TBL_CART where userid_fk = ? and pdno_fk = ? ";
-				
-				pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
-				
-				//pstmt.setString(1, userid_fk);
-				pstmt.setString(1, "siasia");
-				pstmt.setString(2, pdno);
-				
-				result = pstmt.executeUpdate();
-				
-			} finally {
-				close();
-			}
+			String sql = " delete from TBL_CART where userid_fk = ? and pdno_fk = ? ";
 			
-			return result;
+			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+			
+			//pstmt.setString(1, userid_fk);
+			pstmt.setInt(2, pdno);
+			pstmt.setString(1, "siasia");
+			
+			int n = pstmt.executeUpdate();
+			
+		} finally {
+			close();
 		}
-
-		@Override
-		public void productChoiceDelete(int pdno, String userid_fk) throws SQLException {
+		
+	}
+	
+	// 상품 개별삭제 버튼을 누를경우 유저의 ID와 해당 제품의 번호를 받아와 DB테이블에서 삭제해주는 메서드
+	@Override
+	public int productOneDelete(String pdno, String userid_fk) throws SQLException {
+		
+		int result = 0;
+		
+		try {
+			conn = ds.getConnection(); // DBCP에서 connection 받아오기
 			
-			try {
-				conn = ds.getConnection(); // DBCP에서 connection 받아오기
-				
-				String sql = " delete from TBL_CART where userid_fk = ? and pdno_fk = ? ";
-				
-				pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
-				
-				//pstmt.setString(1, userid_fk);
-				pstmt.setString(1, "siasia");
-				pstmt.setInt(2, pdno);
-				
-				pstmt.executeUpdate();
-				
-			} finally {
-				close();
-			}
+			String sql = " delete from TBL_CART where userid_fk = ? and PINFONO = ? ";
 			
+			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+			
+			//pstmt.setString(1, userid_fk);
+			pstmt.setString(1, "siasia");
+			pstmt.setString(2, pdno);
+			
+			result = pstmt.executeUpdate();
+			
+		} finally {
+			close();
 		}
-
-		@Override
-		public List<ProductInfoVO> getSizeAndColor(String userid) throws SQLException {
+		
+		return result;
+	}
+	
+	@Override
+	public void productChoiceDelete(int pdno, String userid_fk) throws SQLException {
+		
+		try {
+			conn = ds.getConnection(); // DBCP에서 connection 받아오기
 			
-			List<ProductInfoVO> productInfoList = new ArrayList<ProductInfoVO>();
+			String sql = " delete from TBL_CART where userid_fk = ? and pdno_fk = ? ";
 			
-			try {
-				conn = ds.getConnection(); // DBCP에서 connection 받아오기
-				
-				String sql = " select pi.PINFONO, PDNO_FK, pcolor, psize "+
-							 " from "+
-							 " ( "+
-							 " select pinfono "+
-							 " from tbl_cart "+
-							 " where userid_fk = ? "+
-							 " )v inner join tbl_product_info pi "+
-							 " on v.pinfono = pi.pinfono ";
-				
-				pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
-				
-				pstmt.setString(1, userid);
-				
-				rs = pstmt.executeQuery(); // select 되어진 결과를 resultSet에 받는다.
-				
-				while(rs.next()) {
-					ProductInfoVO pinfovo = new ProductInfoVO();
-					
-					pinfovo.setPinfono(rs.getInt(1));
-					pinfovo.setPdno_fk(rs.getInt(2));
-					pinfovo.setPcolor(rs.getString(3));
-					pinfovo.setPsize(rs.getString(4));
-					
-					productInfoList.add(pinfovo);
-				} // end of while(rs.next()) ---------------------------
-			} finally {
-				close();
-			}
+			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
 			
-			return productInfoList;
+			//pstmt.setString(1, userid_fk);
+			pstmt.setString(1, "siasia");
+			pstmt.setInt(2, pdno);
+			
+			pstmt.executeUpdate();
+			
+		} finally {
+			close();
 		}
-
-		@Override
-		public String RecordOrder(Map<String, String> paraMap) throws SQLException {
-
-			String result = "";
+		
+	}
+	
+	@Override
+	public List<ProductInfoVO> getSizeAndColor(String userid) throws SQLException {
+		
+		List<ProductInfoVO> productInfoList = new ArrayList<ProductInfoVO>();
+		
+		try {
+			conn = ds.getConnection(); // DBCP에서 connection 받아오기
 			
-			try {
-				conn = ds.getConnection(); // DBCP에서 connection 받아오기
-				
-				String sql = " delete from TBL_CART where userid_fk = ? ";
-				
-				pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
-				
-				pstmt.setString(1, paraMap.get("userid_fk"));
-				
-				pstmt.executeUpdate();
-				
-				//==================================================================================//
-				
-				sql = " insert into tbl_order(odrcode, userid_fk, ODRTOTALPRICE, ODRTOTALPOINT) "
-				    + " values (seq_tbl_order.nextval,?,?,?) ";
-				
-				pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
-				
-				pstmt.setString(1,paraMap.get("userid_fk"));
-				pstmt.setString(2,paraMap.get("finalPrice"));
-				pstmt.setString(3,paraMap.get("usePoint"));
-				
-				//==================================================================================//
-				
-				sql = " select to_char(ODRDATE,'yyyy-mm-dd hh24:mi') "+
-							 " from "+
-							 " ( "+
-							 " select * "+
-							 " from tbl_order "+
-							 " where userid_fk = ? "+
-							 " order by odrdate desc "+
-							 " ) "+
-							 " where rownum = 1 ";
-				
-				pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
-				
-				pstmt.setString(1,paraMap.get("userid_fk"));
-				
-				rs = pstmt.executeQuery();
-				
-				while(rs.next()) {
-					result = rs.getString(1);
-				}
-			} finally {
-				close();
-			}
+			String sql = " select pi.PINFONO, PDNO_FK, pcolor, psize "+
+					" from "+
+					" ( "+
+					" select pinfono "+
+					" from tbl_cart "+
+					" where userid_fk = ? "+
+					" )v inner join tbl_product_info pi "+
+					" on v.pinfono = pi.pinfono ";
 			
-			return result;
+			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+			
+			pstmt.setString(1, userid);
+			
+			rs = pstmt.executeQuery(); // select 되어진 결과를 resultSet에 받는다.
+			
+			while(rs.next()) {
+				ProductInfoVO pinfovo = new ProductInfoVO();
+				
+				pinfovo.setPinfono(rs.getInt(1));
+				pinfovo.setPdno_fk(rs.getInt(2));
+				pinfovo.setPcolor(rs.getString(3));
+				pinfovo.setPsize(rs.getString(4));
+				
+				productInfoList.add(pinfovo);
+			} // end of while(rs.next()) ---------------------------
+		} finally {
+			close();
 		}
+		
+		return productInfoList;
+	}
+	
+	@Override
+	public String RecordOrder(Map<String, String> paraMap) throws SQLException {
+		
+		String result = "";
+		
+		try {
+			
+			conn = ds.getConnection(); // DBCP에서 connection 받아오기
+			
+			String sql = " delete from TBL_CART where userid_fk = ? ";
+			
+			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+			
+			pstmt.setString(1, paraMap.get("userid_fk"));
+			
+			pstmt.executeUpdate();
+			
+			//==================================================================================//
+			
+			sql = " delete from TBL_CART where userid_fk = ? ";
+			
+			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+			
+			pstmt.setString(1, paraMap.get("userid_fk"));
+			
+			pstmt.executeUpdate();
+			
+			//==================================================================================//
+			
+			System.out.println("1");
+			
+			sql = " insert into tbl_order(odrcode, userid_fk, ODRTOTALPRICE, ODRTOTALPOINT) "
+					+ " values (seq_tbl_order.nextval,?,?,?) ";
+			
+			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+			
+			pstmt.setString(1,paraMap.get("userid_fk"));
+			pstmt.setString(2,paraMap.get("finalPrice"));
+			pstmt.setString(3,paraMap.get("addPoint"));
+			
+			pstmt.executeUpdate();
+			
+			//==================================================================================//
+			
+			sql = " select to_char(ODRDATE,'yyyy-mm-dd hh24') "+
+					" from "+
+					" ( "+
+					" select * "+
+					" from tbl_order "+
+					" where userid_fk = ? "+
+					" order by odrdate desc "+
+					" ) "+
+					" where rownum = 1 ";
+			
+			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+			
+			pstmt.setString(1,paraMap.get("userid_fk"));
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				result = rs.getString(1);
+			}
+		} finally {
+			close();
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public OrderVO getOrderInfo(String userid) throws SQLException{
+		
+		OrderVO ovo = new OrderVO();
+		
+		try {
+			conn = ds.getConnection(); // DBCP에서 connection 받아오기
+			
+			String sql = " select ODRCODE, USERID_FK, ODRTOTALPRICE, ODRTOTALPOINT, ODRDATE "+
+					" from tbl_order "+
+					" where USERID_FK = ? "+
+					" order by ODRDATE desc ";
+			
+			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+			
+			pstmt.setString(1, userid);
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				ovo.setOdrcode(rs.getString(1));
+				ovo.setUserid_fk(rs.getString(2));
+				ovo.setOdrtotalprice(rs.getString(3));
+				ovo.setOdrtotalpoint(rs.getString(4));
+				ovo.setOdrdate(rs.getString(5));
+			}
+		} finally {
+			close();
+		}
+		
+		return ovo;
+	}
 
 
 }
