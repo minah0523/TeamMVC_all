@@ -567,14 +567,18 @@
 		
 	}
 	
-	function productOneDelete(pdno) {
+	function productOneDelete(index) {
+		
+		var pinfono = $("input:hidden[name=pinfono]").eq(index).val();
+		
+		alert(pinfono);
 		
 		$.ajax({
 			url : "/TeamMVC/product/productOneDelete.neige",
 			type : "POST",
 			data : {"pdno":pdno,"userid":'${sessionScope.loginuser.userid}'},
 			dataType : "JSON",
-			success : function() {
+			success : function(json) {
 				alert("success");
 			},
 			error : function(request, status, error) {
@@ -665,29 +669,26 @@
 		
 		var datalength = $("div.data").length;
 		
-		var usePoint = $("input:text[id=usePoint]").val();
-		
-		if(usePoint == null) {
-			usePoint = "0";
-		}
+		var addPoint = 0
 		
 		var amount = 0;
 		
 		for(var i=0; i<datalength; i++) {
     		var chk = $("input:checkbox[name=buy]").eq(i).is(":checked");
 			var productAmount = Number($("input:text[name=amountInput]").eq(i).val());
-			amount += productAmount;
+			var productpoint = Number($("input:text[name=productpoint]").eq(i).val());
 			
     		var pinfono = $("input:hidden[name=pinfono]").eq(i).val();
     		
     		if(chk) { 
-    			arrPinfono.push(pinfono);	
+    			arrPinfono.push(pinfono);
+    			
 			}
     	}
 		
 		var para_pinfono = arrPinfono.join();
 		
-		var para_data = {"pdnoes":para_pinfono, "userid_fk":userid, "finalPrice":finalPrice, "usePoint":usePoint, "amount":amount};
+		var para_data = {"pdnoes":para_pinfono, "userid_fk":userid, "finalPrice":finalPrice, "addPoint":addPoint, "amount":amount};
 		
 		$.ajax({
 			 url:"/TeamMVC/product/paymentSuccess.neige", 
@@ -695,7 +696,7 @@
 	         data:para_data,
 	         dataType:"JSON",
 	         success:function(json){
-	        	 location.href="http://localhost:9090/TeamMVC/product/successPaymentPage.neige";
+	        	 successPayment();
 	         },
 	         error: function(request, status, error){
 	            alert("code: "+request.status+"/n"+"message: "+request.responseText+"/n"+"error: "+error);
@@ -703,7 +704,11 @@
 		});
 	} 
 	
-	
+	function successPayment() {
+		
+		location.href="http://localhost:9090/TeamMVC/product/successPaymentPage.neige";
+		
+	}
 		
 </script>
 
@@ -787,7 +792,7 @@
 					
 					<!-- 적립금 -->
 					<li class="col-md-1 notimg">
-						<input style="width: 100px" type="number" class="productpoint" value="${pvo.point}" readonly="readonly" />&nbsp;P
+						<input style="width: 100px" type="number" class="productpoint" name="productpoint" value="${pvo.point}" readonly="readonly" />&nbsp;P
 					</li>
 					
 					<!-- 상품 총 가격 = 상품 수량*가격 -->
@@ -797,7 +802,7 @@
 					
 					<!-- 상품 개별 삭제버튼 -->
 					<li class="col-md-1 notimg">
-						<button type="button" class="btn btn-primary deleteOne" onclick="productOneDelete('${pvo.pdno}')" >삭제</button>
+						<button type="button" name="ondeletebtn" class="btn btn-primary deleteOne" onclick="productOneDelete('${status.index}')" >삭제</button>
 					</li>
 					
 					<!-- 상품번호를 받아와 .java로 전송시켜줄 변수를 만든다.
