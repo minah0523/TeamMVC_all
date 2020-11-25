@@ -3,7 +3,7 @@ package member.mdl;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.sql.*;
-import java.util.Map;
+import java.util.*;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -375,6 +375,182 @@ public class MemberDAO implements InterMemberDAO {
 		return result;		
 
 	}
-	
+
+	// *** 페이징 처리를 한 모든 회원 또는 검색한 회원 목록 보여주기 *** //
+		@Override
+		public List<MemberVO> selectPagingMember(Map<String, String> paraMap)throws SQLException {
+			
+		List<MemberVO> memberList = new ArrayList<>();
+			
+			try {
+				conn = ds.getConnection();
+				
+				String sql = "select userid, name, email, gender "+
+						"from "+
+						"( "+
+						"    select rownum AS rno, userid, name, email, gender "+
+						"    from "+
+						"    ( "+
+						"        select userid, name, email, gender "+
+						"        from tbl_member "+
+						"        where userid != 'admin' "; 
+				
+				String colname = paraMap.get("searchType");
+				String searchWord = paraMap.get("searchWord");
+				
+				if( "email".equals(colname) ) {
+					// 검색대상이 email 인 경우
+					searchWord = aes.encrypt(searchWord);
+				}
+				
+				
+				if( searchWord != null && !searchWord.trim().isEmpty() ) {
+				    
+					sql += " and "+colname+" like '%'|| ? ||'%' ";
+				}
+				
+				sql +=  "    order by registerday desc "+
+						"    ) V "+
+						") T  "+
+						"where rno between ? and ? ";
+				
+				pstmt = conn.prepareStatement(sql);
+				
+				int currentShowPageNo = Integer.parseInt( paraMap.get("currentShowPageNo") );
+				int sizePerPage = Integer.parseInt( paraMap.get("sizePerPage") );
+				
+				if( searchWord != null && !searchWord.trim().isEmpty() ) {
+					pstmt.setString(1, searchWord);
+					pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+					pstmt.setInt(3, (currentShowPageNo * sizePerPage)); // 공식 
+				}
+				else {
+					pstmt.setInt(1, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+					pstmt.setInt(2, (currentShowPageNo * sizePerPage)); // 공식 
+				}
+							
+				rs = pstmt.executeQuery();
+				
+				while(rs.next()) {  
+				   	
+					MemberVO mvo = new MemberVO();
+					mvo.setUserid(rs.getString(1));
+					mvo.setName(rs.getString(2));
+					mvo.setEmail(aes.decrypt(rs.getString(3))); // 복호화 
+					mvo.setGender(rs.getString(4));
+					
+					memberList.add(mvo);
+				}
+				
+			} catch (GeneralSecurityException | UnsupportedEncodingException e) {
+				e.printStackTrace();
+			} finally {
+				close();
+			}		
+			
+			return memberList;		
+		}
+
+		
+		
+		// 페이징처리를 위해서 전체회원에 대한 총페이지 개수 알아오기(select)  
+		@Override
+		public int getTotalPage(Map<String, String> paraMap)throws SQLException {
+			 
+	int totalPage = 0;
+			
+			try {
+				conn = ds.getConnection();
+				
+				String sql = " select ceil( count(*)/ ? ) "
+						   + " from tbl_member"
+						   + " where userid != 'admin' "; 
+				
+				String colname = paraMap.get("searchType");
+				String searchWord = paraMap.get("searchWord");
+				
+				if( "email".equals(colname) ) {
+					// 검색대상이 email 인 경우
+					searchWord = aes.encrypt(searchWord);
+				}
+				
+				
+				if( searchWord != null && !searchWord.trim().isEmpty() ) {
+				    
+					sql += " and "+colname+" like '%'|| ? ||'%' ";
+				}
+				
+				
+				pstmt = conn.prepareStatement(sql);
+				
+				pstmt.setString(1, paraMap.get("sizePerPage"));
+				
+				if( searchWord != null && !searchWord.trim().isEmpty() ) {
+					pstmt.setString(2, searchWord);
+				}
+							
+				rs = pstmt.executeQuery();
+				
+				rs.next();
+				
+				totalPage = rs.getInt(1);
+				
+			} catch (GeneralSecurityException | UnsupportedEncodingException e) {
+				e.printStackTrace();
+			} finally {
+				close();
+			}		
+			
+			return totalPage;				
+		}
+
+		
+		
+		// userid 값을 입력받아서 회원1명에 대한 상세정보를 알아오기(select) 
+		@Override
+		public MemberVO memberOneDetail(String userid) throws SQLException {
+			 
+			MemberVO mvo = null;
+			
+			try {
+				conn = ds.getConnection();
+				
+				String sql = " select userid, name, email, mobile, postcode, address, detailaddress, extraaddress, gender " + 
+						     "   	, substr(birthday,1,4) AS birthyyyy, substr(birthday,6,2) AS birthmm, substr(birthday,9) AS birthdd " + 
+						     "		, coin, point, to_char(registerday, 'yyyy-mm-dd') AS registerday " + 
+						     " from tbl_member " +
+						     " where userid = ? "; 
+				
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1, userid);
+							
+				rs = pstmt.executeQuery();
+				
+				if(rs.next()) {  
+				   	
+					mvo = new MemberVO();
+					mvo.setUserid(rs.getString(1));
+					mvo.setName(rs.getString(2));
+					mvo.setEmail(aes.decrypt(rs.getString(3))); // 복호화 
+					mvo.setMobile( aes.decrypt(rs.getString(4)) ); // 복호화 
+					mvo.setPostcode(rs.getString(5));
+					mvo.setAddress(rs.getString(6));
+					mvo.setDetailaddress(rs.getString(7));
+					mvo.setExtraaddress(rs.getString(8));
+					mvo.setGender(rs.getString(9));
+					mvo.setBirthday(rs.getString(10) + rs.getString(11) + rs.getString(12));
+					mvo.setCoin(rs.getInt(13));
+					mvo.setPoint(rs.getInt(14));
+					mvo.setRegisterday(rs.getString(15));
+				}
+				
+			} catch (GeneralSecurityException | UnsupportedEncodingException e) {
+				e.printStackTrace();
+			} finally {
+				close();
+			}		
+			
+			return mvo;
+		}
 	
 }

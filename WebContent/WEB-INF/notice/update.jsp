@@ -15,9 +15,32 @@
 		text-decoration:none;
 	}
 	div.updateArea {
-		width: 80%;
+		width: 70%;
 		margin: 100px 0 50px 0 ;
 	}
+		div.noticeTitleBox{
+		align-content: center;
+		text-align: center;
+		color: rgb(85, 85, 85);
+	}
+	div#noticeTitleBox{
+		margin: 50px 0;
+	}
+	
+	div#noticeTitle{
+		font-weight: bold;
+		font-size: 16pt;
+	}
+	
+	div#noticeTitleDisc{
+		margin: 5px 0;
+		font-size: 10pt;
+	}
+	
+	tbody#noticeTbody td{
+		font-size: 11pt;
+	}
+	
 	
 </style>
 
@@ -59,12 +82,16 @@
 
 
 	<div class="updateArea">
+		<div class="noticeTitleBox" id="noticeTitleBox">
+			<div class="noticeTitleBox" id="noticeTitle">NOTICE</div>
+			<div class="noticeTitleBox" id="noticeTitleDisc">공지사항 수정은 관리자 권한입니다.</div>
+		</div>
 		<div class="row">
 			<form name="noticeEditFrm">
 				<table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
 					<thead>
 						<tr>
-							<th colspan="2" style="background-color: #eeeeee; text-align: center;">게시판 글 수정 양식</th>
+							<th colspan="2" style="background-color: #f9f9f9; text-align: center; color: #353535">게시판 글 수정 양식</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -77,7 +104,7 @@
 						</tr>
 					</tbody>
 				</table>
-					<button type="button" class="btn btn-primary pull-right" id="btnEdit" onClick="goUpdateNotice();">글수정</button> 
+					<button type="button" class="btn btn-primary pull-right" id="btnEdit" onClick="goUpdateNotice();" style="background-color: #BCA897; border-color: white;">글수정</button> 
 			</form>
 		</div>
 	</div>

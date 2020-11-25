@@ -63,10 +63,10 @@
 		cursor:pointer;
 	}
 	
-	#Cart {
+	#Notice {
 		margin-left : 80px;
-	}	
-	
+	}
+
 	#Main_Search_Input {
 		border: solid 3px #BCA897;	
 		width: 250px;
@@ -229,7 +229,7 @@
 			<div class="col-md-3" id="Gender_Category">
 				<ul id="header_gender">
 					<li value = "1" id= "man">
-						<a href ="javascript:void(0);" onclick="manClick();">MAN</a>
+						<a href ="javascript:void(0);" onclick="manClick();">MEN</a>
 					</li>
 					<li value = "2" id= "women">
 						<a href="javascript:void(0);" onclick="womenClick();">WOMEN</a>
@@ -249,6 +249,8 @@
 			</div>
 			
 			<div class="col-md-4" id="Login_MyInfo_Cart">
+				<a id = "Notice" href="<%= ctxPath %>/notice/notice.neige" >공지사항 </a> <span class= "delimiter" >|</span>
+				
 				<a id = "Cart" href="<%= ctxPath %>/product/productCart.neige" >장바구니 </a> <span class= "delimiter" >|</span>
 				
 				<c:if test="${!empty sessionScope.loginuser}">
@@ -265,11 +267,11 @@
 				<%-- <a href="<%= ctxPath %>/login/loginPage.neige">로그인</a> <span class= "delimiter" >|</span> --%>		
                 <c:choose>
                    <c:when test="${empty sessionScope.loginuser}">
-                      <a href="<%= ctxPath %>/login/loginPage.neige">로그인</a><span class= "delimiter" >|</span>
+                      <a href="<%= ctxPath %>/login/loginPage.neige">로그인</a>
                    </c:when>
                    <c:otherwise>
                      <%--  <span style="color:orange"> ${(sessionScope.loginuser).userid}님</span>  --%>
-                     <a href="<%= ctxPath %>/login/logout.neige">로그아웃</a><span class= "delimiter" >|</span>
+                     <a href="<%= ctxPath %>/login/logout.neige">로그아웃</a>&nbsp;<span class= "delimiter" >|</span>
                    </c:otherwise>
 
                 </c:choose>
@@ -314,3 +316,4 @@
 <div id="contents" align="center">
 
 <!-- <br><br><br><br><br><br> -->
+

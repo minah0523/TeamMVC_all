@@ -1,7 +1,7 @@
 package member.mdl;
 
 import java.sql.SQLException;
-import java.util.Map;
+import java.util.*;
 
 public interface InterMemberDAO {
 
@@ -27,7 +27,17 @@ public interface InterMemberDAO {
 	int pwdUpdate(Map<String, String> paraMap) throws SQLException;
 
 	// 회원의 개인 정보 변경하기  
-		int updateMember(MemberVO member) throws SQLException;
+	int updateMember(MemberVO member) throws SQLException;
+	
+	// *** 페이징 처리를 한 모든 회원 또는 검색한 회원 목록 보여주기 *** //
+	List<MemberVO> selectPagingMember(Map<String, String> paraMap)throws SQLException;
+	
+	
+	// 페이징처리를 위해서 전체회원에 대한 총페이지 개수 알아오기(select)  
+	int getTotalPage(Map<String, String> paraMap)throws SQLException;
+
+	//회원리스트의 회원 상세 페이지를 위해 한 회원의 정보를 알아오기(select) 
+	MemberVO memberOneDetail(String userid)throws SQLException;
 	
 }
 

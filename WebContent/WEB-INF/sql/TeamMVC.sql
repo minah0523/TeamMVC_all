@@ -370,7 +370,7 @@ create table tbl_notice
 (noticeno  NUMBER(10)     NOT NULL,   -- 시퀀스로 입력받음.
 title      VARCHAR2(100)   NOT NULL,
 writeday   DATE     default sysdate,
-contents VARCHAR2(1000) NOT NULL
+contents VARCHAR2(2000) NOT NULL
 );
 
 
@@ -387,6 +387,13 @@ insert into tbl_notice(noticeno, title, contents) values(seq_tbl_notice_noticeno
 insert into tbl_notice(noticeno, title, contents) values(seq_tbl_notice_noticeno.nextval, '원단별 세탁 방법', '모든 의류는 드라이크리닝을 권장합니다! 잘못된 세탁으로 인해 상품이 훼손된 경우에는 교환/반품의 사유가 되지 않으니 참고 부탁드립니다.');
 
 commit;
+
+ INSERT INTO tbl_notice(noticeno, title, contents) 
+ VALUES(seq_tbl_notice_noticeno.nextval, '배송/개별배송 공지사항', 'NEIGE는 전상품 무료배송입니다.') ;
+ INSERT INTO tbl_notice(noticeno, title, contents) 
+ VALUES(seq_tbl_notice_noticeno.nextval, '배송/개별배송 공지사항', 'NEIGE는 전상품 무료배송입니다.') ;
+
+
 
 
 select * from tbl_notice;
@@ -406,14 +413,23 @@ SELECT SYSDATE FROM DUAL;
 
 SELECT noticeno FROM tbl_notice ORDER BY noticeno DESC;
 
+delete from tbl_notice
+where noticeno = 1;
 
 
 
+rollback;
 
+-----
+select * from tbl_notice;
 
+delete from tbl_notice;
 
+commit;
 
+-----------------------------------
 
+drop table tbl_notice;
 
-
+drop sequence seq_tbl_notice_noticeno;
 

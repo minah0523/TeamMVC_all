@@ -19,14 +19,13 @@ public class ProductChoiceDeleteAction extends AbstractController {
 		
 		String[] arrPdno = pdnoes.split(",");
 		
-		for(int i=0; i<arrPdno.length; i++) {
-			System.out.println(arrPdno[i]);
-		}
 		
-		/*
-		 * for(int i=0; i<arrPdno.length; i++) { int pdno =
-		 * Integer.parseInt(arrPdno[i]); pdao.productChoiceDelete(pdno, userid_fk); }
-		 */
+		
+		for(int i=0; i<arrPdno.length; i++) { 
+			int pdno = Integer.parseInt(arrPdno[i]); 
+			pdao.productChoiceDelete(pdno, userid_fk);
+		}
+		 
 		
 	}
 

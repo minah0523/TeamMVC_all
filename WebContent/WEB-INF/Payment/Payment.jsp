@@ -19,6 +19,10 @@
 <link rel="stylesheet" type="text/css" href="<%= ctxPath%>/OwlCarousel2-2.3.4/dist/assets/owl.theme.green.css" />
 <link rel="stylesheet" type="text/css" href="<%= ctxPath%>/OwlCarousel2-2.3.4/dist/assets/owl.theme.green.min.css" />
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" /> 
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
+<script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.5.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
 <script src="<%= ctxPath%>/OwlCarousel2-2.3.4/dist/owl.carousel.min.js"></script>
 
 <style>
@@ -55,6 +59,19 @@
 			sumPrice += iprice;
 			sumAmount += iamount
 		}
+		
+		var arrPdno = new Array();
+		 <c:forEach var="pvo" items="${cartList}">
+		   arrPdno.push('${pvo.pdno}'); 
+		 </c:forEach>
+		 
+		 <c:forEach var="pinfovo" items="${productInfoList}" varStatus="status">
+		 	if(arrPdno["${status.index}"] == "${pinfovo.pdno_fk}"){
+				$("span.pcolor").eq("${status.index}").html("${pinfovo.pcolor}");
+				$("span.psize").eq("${status.index}").html("${pinfovo.psize}");
+				$("input:hidden[name=pinfono]").eq("${status.index}").val("${pinfovo.pinfono}");
+			} 
+		 </c:forEach>
 		
 		$("input.sumAmount").val( sumAmount );
 		$("input.sumPrice").val( sumPrice );
@@ -468,6 +485,7 @@
 			$("input:text[id=postcode]").val("${sessionScope.loginuser.postcode}");
 			$("input:text[id=address]").val("${sessionScope.loginuser.address}");
 			$("input:text[id=mobile]").val("${sessionScope.loginuser.mobile}");
+			$("input:text[id=detailAddress]").val("${sessionScope.loginuser.detailaddress}");
 		//--------------------------------- 주소 불러오기 끝 ---------------------------------//
 		
 		});
@@ -479,6 +497,7 @@
 			$("input:text[id=address]").val("");
 			$("input:text[id=mobile]").val("");
 			$("input:text[id=deliveryMessage]").val("");
+			$("input:text[id=detailAddress]").val("");
 		//--------------------------------- 새로운 배송지 작성 끝 ---------------------------------//
 		
 		});
@@ -542,7 +561,7 @@
 	            alert("success");
 	         },
 	         error: function(request, status, error){
-	            alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
+	            alert("code: "+request.status+"/n"+"message: "+request.responseText+"/n"+"error: "+error);
 	         }
 	      });
 		
@@ -559,8 +578,8 @@
 				alert("success");
 			},
 			error : function(request, status, error) {
-				alert("code: " + request.status + "\n" + "message: "
-						+ request.responseText + "\n" + "error: " + error);
+				alert("code: " + request.status + "/n" + "message: "
+						+ request.responseText + "/n" + "error: " + error);
 			}
 
 		});
@@ -570,13 +589,21 @@
 		
 		var arrPdno = new Array();
 		
-		<c:forEach var="pvo" items="${cartList}" varStatus="status">
-			arrPdno.push('${pvo.pdno}');
-		</c:forEach>
+		var datalength = $("div.data").length;
+		
+		for(var i=0; i<datalength; i++) {
+    		var chk = $("input:checkbox[name=buy]").eq(i).is(":checked");
+			
+    		var pdno = $("input:hidden[name=pdno]").eq(i).val();
+    		
+    		if(chk) { 
+    			arrPdno.push(pdno);	
+			}
+    	}
 		
 		var para_pdnoes = arrPdno.join(","); // "1,1,1,1,2,3,4"
 		
-		var para_data = {"pdnoes":para_pdnoes,"userid_fk":'${sessionScope.loginuser.userid}'};
+		var para_data = {"pdnoes":para_pdnoes, "userid_fk":'${sessionScope.loginuser.userid}'};
 		
 		$.ajax({
 			 url:"/TeamMVC/product/productChoiceDelete.neige", 
@@ -587,13 +614,97 @@
 	            alert("success");
 	         },
 	         error: function(request, status, error){
-	            alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
+	            alert("code: "+request.status+"/n"+"message: "+request.responseText+"/n"+"error: "+error);
 	         }
 
 		});
 		
 	}
 	
+	// 선택상품 주문하기 버튼 이벤트
+	function productOrder(userid) {
+		
+		// 최종결제금액
+		var finalPrice = $("input:text[id=finalPrice]").val();
+		
+		if(finalPrice == "0") {
+			swal("상품을 선택해주시기 바랍니다.");
+			return false;
+		}
+		
+		// 결제URL
+		var url = "/TeamMVC/product/paymentGateway.neige?userid="+userid+"&finalPrice="+finalPrice;
+		
+		
+		window.open(url, "paymentGateway",
+	    "left=350px, top=100px, width=850px, height=620px");
+		} 
+	
+	// 전체상품 주문이벤트
+	function productAllOrder(userid) {
+		
+		// 전체상품금액
+		var finalPrice = $("input:text[name=sumPrice]").val();
+		
+		var datalength = $("div.data").length;
+		
+		for(var i=0; i<datalength; i++) {
+			$("input:checkbox[name=buy]").eq(i).prop('checked', true);
+    	}
+		
+		// 결제 URL
+		var url = "/TeamMVC/product/paymentGateway.neige?userid="+userid+"&finalPrice="+finalPrice;
+		
+		window.open(url, "paymentGateway",
+		"left=350px, top=100px, width=850px, height=620px");
+		}
+	
+	function productOrderRecord(userid, finalPrice) {
+		
+		var arrPinfono = new Array();
+		
+		var datalength = $("div.data").length;
+		
+		var usePoint = $("input:text[id=usePoint]").val();
+		
+		if(usePoint == null) {
+			usePoint = "0";
+		}
+		
+		var amount = 0;
+		
+		for(var i=0; i<datalength; i++) {
+    		var chk = $("input:checkbox[name=buy]").eq(i).is(":checked");
+			var productAmount = Number($("input:text[name=amountInput]").eq(i).val());
+			amount += productAmount;
+			
+    		var pinfono = $("input:hidden[name=pinfono]").eq(i).val();
+    		
+    		if(chk) { 
+    			arrPinfono.push(pinfono);	
+			}
+    	}
+		
+		var para_pinfono = arrPinfono.join();
+		
+		var para_data = {"pdnoes":para_pinfono, "userid_fk":userid, "finalPrice":finalPrice, "usePoint":usePoint, "amount":amount};
+		
+		$.ajax({
+			 url:"/TeamMVC/product/paymentSuccess.neige", 
+	      	 type:"POST",
+	         data:para_data,
+	         dataType:"JSON",
+	         success:function(json){
+	        	 location.href="http://localhost:9090/TeamMVC/product/successPaymentPage.neige";
+	         },
+	         error: function(request, status, error){
+	            alert("code: "+request.status+"/n"+"message: "+request.responseText+"/n"+"error: "+error);
+	         }
+		});
+	} 
+	
+	
+		
 </script>
 
 </head>
@@ -605,10 +716,11 @@
 		<%-- 로그인된 유저가 아닌 일반사용자가 장바구니를 클릭할 경우 --%>
 		<%-- <c:if test="${not empty sessionScope.loginuser}"> --%>
 			<div id="userInfo" class="widthController">
-				<div>
+				<%-- <div>
 					<a id="userName">${sessionScope.loginuser.userid}</a>님의 충전금 잔액 : [${sessionScope.loginuser.coin}]원 남아 있으십니다.
 				</div>
-				<div>
+				 --%>
+				 <div>
 					<a id="userName">${sessionScope.loginuser.userid}</a>님의 포인트 : [${sessionScope.loginuser.point}] 포인트 남아 있으십니다.
 				</div>
 			</div>
@@ -623,7 +735,9 @@
 				<input type="checkbox" id="buyAllCheck" name="buyAllCheck">
 			</div>
 			<div class="col-md-1">이미지</div>
-			<div class="col-md-5">상품정보</div>
+			<div class="col-md-3">상품정보</div>
+			<div class="col-md-1">색상</div>
+			<div class="col-md-1">사이즈</div>
 			<div class="col-md-1">판매가</div>
 			<div class="col-md-1">수량</div>
 			<div class="col-md-1">적립금</div>
@@ -647,8 +761,15 @@
 						<img src="<%=ctxPath%>/images/${pvo.pdimage1}" style="width: 100px; height: 100px; margin: 0 auto; ">
 					</li>
 					
-					<li class="col-md-5 notimg">
+					<li class="col-md-3 notimg">
 						<span>${pvo.pdcontent}</span>
+					</li>
+		
+					<li class="col-md-1 notimg">
+						<span class="pcolor"></span>
+					</li>
+					<li class="col-md-1 notimg">
+						<span class="psize"></span>
 					</li>
 					<!-- 상품가격 -->
 					<li class="col-md-1 notimg">
@@ -683,8 +804,12 @@
 						  상품번호로 상품DB에서 상품VO를 가져와 해당 form에 적용 
 					 -->
 					 <li>
-						<input type="hidden" name="pdno">
+						<input type="hidden" name="pdno" value="${pvo.pdno}">
 					</li>
+					<li>
+						<input type="hidden" name="pinfono">
+					</li>
+		
 				</ul>
 			</div>
 		</c:forEach>
@@ -700,7 +825,7 @@
 		
 			<!-- "장바구니 전체 합계 정보" -->
 				<div class="widthController sum_p_num" align="right">상품갯수: <input type="number" readonly="readonly" name="sumAmount" class="sumAmount" /> 개</div>
-				<div class="widthController sum_p_price" align="right">합계금액: <input type="number" readonly="readonly" name="sumPrice" class="sumPrice" /> 원</div>
+				<div class="widthController sum_p_price" align="right">합계금액: <input type="text" readonly="readonly" name="sumPrice" class="sumPrice" /> 원</div>
 			<!-- 배송 정보 -->
 			<table class="widthController" id="addressInfoTbl">
 				<tbody>
@@ -735,7 +860,9 @@
 					<tr>
 						<td style="width: 20%; font-weight: bold;" class="td_title">주소</td>
 						<td style="width: 80%; text-align: left;">
-							<input type="text" id="address" name="address" size="60" placeholder="주소" style="margin-bottom: 10px;" /><br /> <input type="text" id="detailAddress" name="detailAddress" size="60" placeholder="상세주소" /><br /> <span class="error">주소를 입력하세요</span>
+							<input type="text" id="address" name="address" size="60" placeholder="주소" style="margin-bottom: 10px;" /><br /> 
+							<input type="text" id="detailAddress" name="detailAddress" size="60" placeholder="상세주소" /><br /> 
+							<span class="error">주소를 입력하세요</span>
 						</td>
 					</tr>
 					<tr>
@@ -780,8 +907,8 @@
 	
 			<!-- 상품 주문 -->
 			<div class="widthController" align="right" style="display: inline-block;">
-				<button type="button" class="btn btn-primary orderBtn" id="orderBtn">선택한 상품 주문</button>
-				<button type="button" class="btn btn-primary orderBtn" id="allOrderBtn">전체 상품 주문</button>
+				<button type="button" class="btn btn-primary orderBtn" id="orderBtn" name="orderBtn" onclick="productOrder('${sessionScope.loginuser.userid}')">선택한 상품 주문</button>
+				<button type="button" class="btn btn-primary orderBtn" id="allOrderBtn" name="allOrderBtn" onclick="productAllOrder('${sessionScope.loginuser.userid}')">전체 상품 주문</button>
 			</div>
 			
 			<!-- 추천상품 -->

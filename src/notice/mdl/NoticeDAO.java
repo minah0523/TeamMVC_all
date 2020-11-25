@@ -197,7 +197,7 @@ public class NoticeDAO implements InterNoticeDAO{
 			try {
 			
 				conn = ds.getConnection();
-
+				
 				String sql = " UPDATE tbl_notice SET title = ?, contents = ? WHERE noticeno = ?";
 				
 				pstmt = conn.prepareStatement(sql);
@@ -213,112 +213,32 @@ public class NoticeDAO implements InterNoticeDAO{
 			return result;	
 		}
 
-		
-	
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	public int getNext() {
-		String sql = "SELECT noticeno FROM tbl_notice ORDER BY noticeno DESC";
-		try {
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			rs = pstmt.executeQuery();
-			if (rs.next()) {
-				return rs.getInt(1) + 1;
-			}
-			return 1; // 첫 번째 게시물인 경우
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return -1; //데이터베이스 오류
-	}
-	
-	public int write(String title, String contents) {
-		String sql = " INSERT INTO tbl_notice(noticeno, title, contents) "
-						+ " VALUES(?, ?, ?) ";
-		try {
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, getNext());
-			pstmt.setString(2, title);
-			pstmt.setString(3, contents);
-			return pstmt.executeUpdate();
-		} 
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return -1; //데이터베이스 오류
-	}
-	
-	
-	public boolean nextPage(int pageNumber) {
-		
-		String sql = "SELECT * FROM tbl_notice WHERE noticeno < ? ";
-		try {
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1,  getNext() - (pageNumber - 1) * 10);
-			rs = pstmt.executeQuery();
-			if (rs.next()) {
-				return true;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false; //데이터베이스 오류
-	}
-	
-	public NoticeVO getNotice(int noticeno) {
-		String sql = "SELECT * FROM tbl_notice WHERE noticeno = ?";
-		try {
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setInt(1, noticeno);
-			
-			rs = pstmt.executeQuery();
-			
-			if (rs.next()) {
-				NoticeVO nvo = new NoticeVO();
-				nvo.setNoticeno(rs.getInt(1));
-				nvo.setTitle(rs.getString(2));
-				nvo.setContents(rs.getString(3));
-				return nvo;
-			}
-		} 
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	public int update(int noticeno, String title, String contents) {
-		String sql = "UPDATE tbl_notice SET title = ?, contents = ? WHERE noticeno = ?";
-		try {
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1, title);
-			pstmt.setString(2, contents);
-			pstmt.setInt(3, noticeno);
-			return pstmt.executeUpdate();
-		} 
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return -1; //데이터베이스 오류
-	}
-	
-	public int delete(int noticeno) {
-		String sql = "UPDATE tbl_notice SET title = 0 WHERE noticeno = ?";
-		try {
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, noticeno);
-			return pstmt.executeUpdate();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
-		return -1; //데이터베이스 오류
-	}
 
-	
+		// 공지사항 삭제하기
+		@Override
+		public int deleteNotice(String noticeno) throws SQLException {
+		
+			int result = 0;
 
+			try {
+			
+				conn = ds.getConnection();
+
+				String sql = " delete from tbl_notice "+
+							 " where noticeno = ? ";
+
+				
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1, noticeno);
+				
+			    result = pstmt.executeUpdate();
+			    
+			} finally {
+				close();
+			}
+			return result;	
+		
+		}
 
 	
 }

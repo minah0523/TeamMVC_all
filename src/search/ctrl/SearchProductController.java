@@ -190,10 +190,10 @@ public class SearchProductController extends AbstractController {
    			while( !(loop > blockSize || pageNo > totalPage ) ) {
    				
    				if( pageNo == Integer.parseInt(currentShowPageNo) ) {
-   					pageBar += "&nbsp;<span style='border:solid 1px gray; color:red; padding: 2px 4px;'>"+pageNo+"</span>&nbsp;";
+   					pageBar += "&nbsp;<span style='border:solid 1px #7B5232; font-weight: bold; color:#7B5232; padding: 2px 4px;'>"+pageNo+"</span>&nbsp;";
    				}
    				else {
-   					pageBar += "&nbsp;<a href='SearchPage.neige?currentShowPageNo="+pageNo+"&pdgender="+pdgender+"&pdcategory_fk="+pdcategory_fk+"&searchname="+searchname+"&sort="+sort+"'>"+pageNo+"</a>&nbsp;"; 
+   					pageBar += "&nbsp;<a style='color:black;' href='SearchPage.neige?currentShowPageNo="+pageNo+"&pdgender="+pdgender+"&pdcategory_fk="+pdcategory_fk+"&searchname="+searchname+"&sort="+sort+"'>"+pageNo+"</a>&nbsp;"; 
    				}
    				
    				loop++;   // 1 2 3 4 5 6 7 8 9 10 
