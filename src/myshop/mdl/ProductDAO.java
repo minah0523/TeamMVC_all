@@ -2324,35 +2324,61 @@ public class ProductDAO implements InterProductDAO {
 	      try {
 	          conn = ds.getConnection();
 	          
-	          String sql = " select pdno, pdname, pdcategory_fk, pdimage1, pdimage2, price, saleprice, pdinputdate, pdgender "
+	          
+	          String sql = "";
+	          
+	          // 인기상품순 정렬이 아닌 경우 ordersum(판매수량)은 필요가 없으므로 조인하지 않는다
+	          if(!("sortBestProduct".equalsIgnoreCase(paraMap.get("sort")))) {
+	          sql = " select pdno, pdname, pdcategory_fk, pdimage1, pdimage2, price, saleprice, pdinputdate, pdgender "
 	          		+ "from "+
 					"( "+
 					"    select rownum AS rno, pdno, pdname, pdcategory_fk, pdimage1, pdimage2, price, saleprice, pdinputdate, pdgender  "+
 					"    from "+
 					"    ( "+
-					"        select pdno, pdname, pdcategory_fk, pdimage1, pdimage2, price, saleprice, pdinputdate, pdgender  ";
+					"        select pdno, pdname, pdcategory_fk, pdimage1, pdimage2, price, saleprice, pdinputdate, pdgender "
+					+"		 from tbl_product ";
 	          
+	          
+	          }else if("sortBestProduct".equalsIgnoreCase(paraMap.get("sort"))) {
+	        	  // 인기상품순 정렬을 선택한 경우 주문수량을 구하기 위한 sql join 부분을 추가한다
+	        	   sql = " select pdno, pdname, pdcategory_fk, pdimage1, pdimage2, price, saleprice, pdinputdate, pdgender, ordersum "
+	  	          		+ "from "
+	        			+ "( "
+	  	          		+ " select rownum AS rno, pdno, pdname, pdcategory_fk, pdimage1, pdimage2, price, saleprice, pdinputdate, pdgender, ordersum  "
+	        			+"  from "
+	  	          		+"  ( "
+	        			+"  	select pdno, pdname, pdcategory_fk, pdimage1, pdimage2, price, saleprice, pdinputdate, pdgender, nvl(ordersum,0) as ordersum  "
+	        	  		+" 		from tbl_product "
+        				+ "		left join   "
+  		          		+ "			(  "
+  		          		+ "				select pdno_fk, sum(oqty) as ordersum  "
+  		          		+ "				from  "
+  		          		+ "				(select * from   "
+  		          		+ "				TBL_ORDERDETAIL join TBL_PRODUCT_INFO  "
+  		          		+ "				on TBL_ORDERDETAIL.fk_pinfono = TBL_PRODUCT_INFO.pinfono  "
+  		          		+ "			) M  "
+  		          		+ "			group by pdno_fk  "
+  		          		+ "			) N  "
+  		          		+ "		on pdno = N.pdno_fk" ;
+	          }
+	          				
 	          
 	          if( "1".equals(paraMap.get("pdgender")) || "2".equals(paraMap.get("pdgender"))) { // gender에 성별을 '여성(2)' '남성(1)' 입력했다면 
 	             if(paraMap.get("searchname") == null ) { //searchname(키워드)에 아무것도 입력하지 않았다면,
 	                
 	                if ( "0".equals(paraMap.get("pdcategory_fk")) ) { //pdcategory_fk(카테고리) 중 0(전체)을 선택했다면
-	                   sql += " from tbl_product "
-	                         + " where pdgender = ? ";
+	                   sql += " where pdgender = ? ";
 	                }
 	                else { //pdcategory_fk(카테고리) 중 0(전체)외에 다른 카테고리를 선택했다면
-	                   sql += " from tbl_product "
-	                        + " where pdcategory_fk = ? and pdgender = ? ";
+	                   sql += " where pdcategory_fk = ? and pdgender = ? ";
 	                }
 	             }
 	             else { //searchname(키워드)에 입력이 되었다면,
 	                if ( "0".equals(paraMap.get("pdcategory_fk")) ) { //pdcategory_fk(카테고리) 중 0(전체)을 선택했다면
-	                   sql += " from tbl_product "
-	                       + " where pdname like '%'|| ? ||'%' and pdgender = ?  ";
+	                   sql += " where pdname like '%'|| ? ||'%' and pdgender = ?  ";
 	                }
 	                else {   //pdcategory_fk(카테고리) 중 0(전체)외에 다른 카테고리를 선택했다면
-	                   sql += " from tbl_product "
-	                      + " where pdcategory_fk = ? and pdname like '%'|| ? ||'%' and pdgender = ? ";   
+	                   sql +=" where pdcategory_fk = ? and pdname like '%'|| ? ||'%' and pdgender = ? ";   
 	                }
 	             }
 	             
@@ -2363,27 +2389,25 @@ public class ProductDAO implements InterProductDAO {
 	             if(paraMap.get("searchname") == null ) { //searchname(키워드)에 아무것도 입력하지 않았다면,
 	                
 	                if ( "0".equals(paraMap.get("pdcategory_fk")) ) { //pdcategory_fk(카테고리) 중 0(전체)을 선택했다면
-	                   sql += " from tbl_product ";
+	                   sql += " ";
 	                }
 	                else { //pdcategory_fk(카테고리) 중 0(전체)외에 다른 카테고리를 선택했다면
-	                   sql += " from tbl_product "
-	                        + " where pdcategory_fk = ? ";
+	                   sql += " where pdcategory_fk = ? ";
 	                }
 	             }
 	             else { //searchname(키워드)에 입력이 되었다면,
 	                if ( "0".equals(paraMap.get("pdcategory_fk")) ) { //pdcategory_fk(카테고리) 중 0(전체)을 선택했다면
-	                   sql += " from tbl_product "
-	                       + " where pdname like '%'|| ? ||'%' ";
+	                   sql += " where pdname like '%'|| ? ||'%' ";
 	                }
 	                else {   //pdcategory_fk(카테고리) 중 0(전체)외에 다른 카테고리를 선택했다면
-	                   sql += " from tbl_product "
-	                      + " where pdcategory_fk = ? and pdname like '%'|| ? ||'%' ";   
+	                   sql += " where pdcategory_fk = ? and pdname like '%'|| ? ||'%' ";   
 	                }
 	             }
 	             
 	          }// end of else -----------
 	          
 	          
+
 	          // 신상품순을 클릭했다면
 	          if( paraMap.get("sort") == null ) {
 	             sql += " order by pdinputdate desc  ";
@@ -2399,9 +2423,9 @@ public class ProductDAO implements InterProductDAO {
 	          else if("sortHighPrice".equalsIgnoreCase(paraMap.get("sort"))) {
 	             sql += " order by saleprice desc ";
 	          }
-	          // 인기상품순을 클릭했다면 ------------- 현재 신상품순으로 정렬되고 있음 (수정필요)
+	          // 인기상품순을 클릭했다면
 	          else if("sortBestProduct".equalsIgnoreCase(paraMap.get("sort"))) {
-	             sql += " order by pdinputdate desc  ";
+	             sql += " order by ordersum desc  ";
 	          }
 	          else { // 아무것도 클릭하지 않았다면 신상품순으로 정렬
 	             sql += " order by pdinputdate desc  ";
@@ -2687,7 +2711,6 @@ public class ProductDAO implements InterProductDAO {
 
 
 	} 
-		
 		
 		
 /////////////////////////////////////////////////////////////////////////////홍승의/////////////////////////////////////////////////////////////////////////////////
