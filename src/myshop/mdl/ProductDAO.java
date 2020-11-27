@@ -2563,8 +2563,8 @@ public class ProductDAO implements InterProductDAO {
 		@Override
 		public Map<String, String> getTotal(Map<String, String> paraMap) throws SQLException {
 			
-			int totalSearchProduct = 0;
-			int totalPage = 0;
+			//int totalSearchProduct = 0;
+			//int totalPage = 0;
 		          
 			conn = ds.getConnection();
 			          
@@ -2678,7 +2678,10 @@ public class ProductDAO implements InterProductDAO {
 	        	  totalMap.put("totalPage", String.valueOf(rs.getInt(2)));
 	          }     
              
-			return totalMap;		
+	         close();
+			
+	         return totalMap;		
+		
 
 
 	} 
