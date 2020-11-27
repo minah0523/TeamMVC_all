@@ -89,36 +89,44 @@ public interface InterProductDAO {
 	Map<String, String> getTotal(Map<String, String> paraMap) throws SQLException;
 	
 	// 승의
-	/*
-	 * // 물품상세페이지에 ProductList 모두 조회 (승의) 
-	 * List<ProductVO> ProductList() throwsSQLException;
-	 */
+		/*
+		 * // 물품상세페이지에 ProductList 모두 조회 (승의) List<ProductVO> ProductList()
+		 * throwsSQLException;
+		 */
 
-	// 물품상세페이지에 ProductList의 해당 pdno의 정보 조회 (승의)
-	List<ProductVO> ProductList(String pdno) throws SQLException;
+		// 물품상세페이지에 ProductList의 해당 pdno의 정보 조회 (승의)
+		List<ProductVO> ProductList(String pdno) throws SQLException;
 
-	// 물품상세페이지에서의 사이즈,색상 (승의)
-	List<ProductInfoVO> ProductInfoList(String pdno) throws SQLException;
+		// 물품상세페이지에서의 사이즈,색상 (승의)
+		List<ProductInfoVO> ProductInfoList(String pdno) throws SQLException;
 
-	// 특정 회원이 특정 제품에 대해 좋아요에 투표하기(insert)
-	int like(Map<String, String> paraMap) throws SQLException;
+		// 특정 회원이 특정 제품에 대해 좋아요에 투표하기(insert)
+		int like(Map<String, String> paraMap) throws SQLException;
 
-	// 특정 제품에 대한 좋아요의 개수결과(select)
-	Map<String, Integer> getLikeCnt(String pdno) throws SQLException;
+		// 특정 제품에 대한 좋아요의 개수결과(select)
+		Map<String, Integer> getLikeCnt(String pdno) throws SQLException;
 
-	// ------
-	// 현재 페이지의 제품의 pdno를 받아와 장바구니에 insert해준다.
-	int addCart(Map<String, String> paraMap) throws SQLException;
+		// ------
+		// 현재 페이지의 제품의 pdno를 받아와 장바구니에 insert해준다.
+		int addCart(Map<String, String> paraMap) throws SQLException;
 
-	// ProductVO selectOneProductByPnum(String pdno) throws SQLException;
-	
-   // Ajax 를 이용한 특정 제품의 상품후기를 입력(insert)하기
-   int addComment(PurchaseReviewsVO previewvo) throws SQLException;
+		// ProductVO selectOneProductByPnum(String pdno) throws SQLException;
 
-   // Ajax 를 이용한 특정 제품의 상품후기를 조회(select)하기
-   List<PurchaseReviewsVO> commentList(String fk_pdno) throws SQLException;
-	
-	// 승의 끝
+		// Ajax 를 이용한 특정 제품의 상품후기를 입력(insert)하기
+		int addComment(PurchaseReviewsVO previewvo) throws SQLException;
+
+		// Ajax 를 이용한 특정 제품의 상품후기를 조회(select)하기
+		List<PurchaseReviewsVO> commentList(String fk_pdno) throws SQLException;
+
+		// 주문상세페이지에서 제품번호, 사이즈, 색상을 기반으로 제품상세번호를 받아온다.(승의)
+		String getPinfono(String color, String size, String pdno) throws SQLException;
+		
+		// List<CartVO> sendCartList(String pinfono) throws SQLException;
+		// int sendCartList(CartVO cvo) throws SQLException;
+		int sendCartList(Map<String, String> cartMap) throws SQLException;
+		
+		
+		// 승의 끝
 	
 	// 장바구니 테이블에 존재하는 row를 특정유저(로그인된 유저)의 아이디와 제품번호를 사용하여
 	// select 해온뒤 List에 담는다. 그 뒤 해당 List를 이용하여 반복문을 사용해 선택한 제품을 화면에 출력  (동휘)
