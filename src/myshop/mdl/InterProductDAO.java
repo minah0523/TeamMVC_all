@@ -125,13 +125,13 @@ public interface InterProductDAO {
 	List<ProductVO> getCartList(String userid) throws SQLException;
 	
 	// 장바구니 테이블 안에 userid_fk로 입력받은 사람의 모든 열을 삭제, 전체삭제버튼 (동휘)
-	void productAllDelete(int arrPdno, String userid_fk) throws SQLException;
+	int productAllDelete(int arrPdno, String userid_fk) throws SQLException;
 	
 	// 상품 개별삭제 버튼을 누를경우 유저의 ID와 해당 제품의 번호를 받아와 DB테이블에서 삭제해주는 메서드(동휘)
 	int productOneDelete(String pdno, String userid_fk) throws SQLException;
 	
 	// 장바구니에서 선택상품들을 DB테이블에서 삭제시키는 메서드(동휘)
-	void productChoiceDelete(int pdno, String userid_fk) throws SQLException;
+	int productChoiceDelete(int pdno, String userid_fk) throws SQLException;
 	
 	// 장바구니테이블의 userid를 기반으로 상품상세테이블에서 사이즈, 색상들을 받아오는 메서드(동휘)
 	List<ProductInfoVO> getSizeAndColor(String userid) throws SQLException;
@@ -141,5 +141,4 @@ public interface InterProductDAO {
 
 	// 주문완료페이지에 완료정보를 뿌려주기 위한 메서드(동휘)
 	OrderVO getOrderInfo(String userid) throws SQLException;
-	
 }
