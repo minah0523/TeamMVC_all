@@ -9,32 +9,6 @@ public class OrderDetailVO {
 	private int deliverstatus; /* 배송상태 */
 	private int deliverdate;   /* 배송완료일자 */
 	
-	   ///////////////////////////////////////////
-
-	   private OrderVO ordervo; //주문객체
-	   private ProductVO productvo;//제품객체
-	   private MemberVO membervo;  // 회원객체
-
-	   public OrderVO getOrdervo() {
-	      return ordervo;
-	   }
-	   public void setOrdervo(OrderVO ordervo) {
-	      this.ordervo = ordervo;
-	   }
-	   public ProductVO getProductvo() {
-	      return productvo;
-	   }
-	   public void setProductvo(ProductVO productvo) {
-	      this.productvo = productvo;
-	   }
-	   public MemberVO getMembervo() {
-		   return membervo;
-	   }
-	   public void setMembervo(MemberVO membervo) {
-		   this.membervo = membervo;
-	   }
-	///////////////////////////////////////////
-	
 	public int getOdrseqnum() {
 		return odrseqnum;
 	}

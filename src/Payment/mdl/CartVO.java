@@ -2,7 +2,12 @@ package Payment.mdl;
 
 public class CartVO {
 	
+	private String userid_fk;
+	private String registerday;
 	private String cartno;
+	private int pinfono;
+	private int pqty;
+	
 	public String getCartno() {
 		return cartno;
 	}
@@ -33,10 +38,6 @@ public class CartVO {
 	public void setPqty(int pqty) {
 		this.pqty = pqty;
 	}
-	private String userid_fk;
-	private String registerday;
-	private int pinfono;
-	private int pqty;
-
+	
 	
 }
