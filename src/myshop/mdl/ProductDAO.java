@@ -2312,6 +2312,7 @@ public class ProductDAO implements InterProductDAO {
 	}	
 	
 	
+
 		////////////////////////////////////////////////////////////김민아//////////////////////////////////////////////////////////////////////
 		
 		
@@ -2350,16 +2351,8 @@ public class ProductDAO implements InterProductDAO {
 	        			+"  	select pdno, pdname, pdcategory_fk, pdimage1, pdimage2, price, saleprice, pdinputdate, pdgender, nvl(ordersum,0) as ordersum  "
 	        	  		+" 		from tbl_product "
         				+ "		left join   "
-  		          		+ "			(  "
-  		          		+ "				select pdno_fk, sum(oqty) as ordersum  "
-  		          		+ "				from  "
-  		          		+ "				(select * from   "
-  		          		+ "				TBL_ORDERDETAIL join TBL_PRODUCT_INFO  "
-  		          		+ "				on TBL_ORDERDETAIL.fk_pinfono = TBL_PRODUCT_INFO.pinfono  "
-  		          		+ "			) M  "
-  		          		+ "			group by pdno_fk  "
-  		          		+ "			) N  "
-  		          		+ "		on pdno = N.pdno_fk" ;
+  		          		+ "				view_ordercodedetail "
+  		          		+ "		on pdno = view_ordercodedetail.pdno_fk" ;
 	          }
 	          				
 	          
@@ -2711,6 +2704,7 @@ public class ProductDAO implements InterProductDAO {
 
 
 	} 
+		
 		
 		
 /////////////////////////////////////////////////////////////////////////////홍승의/////////////////////////////////////////////////////////////////////////////////
