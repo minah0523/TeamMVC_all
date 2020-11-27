@@ -198,204 +198,158 @@ public class ProductDAO implements InterProductDAO {
 
 	   // 카테고리
 
-	   // 카테고리 목록 보여주는 메소드(코트, 자켓, 점퍼, 무스탕, 가디건)(JIEUN)
-	   @Override
-	   public List<CategoryVO> CategoryListSelectAll() throws SQLException {
+	  // 카테고리 목록 보여주는 메소드(코트, 자켓, 점퍼, 무스탕, 가디건)(JIEUN)
+	  @Override
+	  public List<CategoryVO> CategoryListSelectAll() throws SQLException {
 
-	      List<CategoryVO> categoryList = new ArrayList<CategoryVO>();
+		  List<CategoryVO> categoryList = new ArrayList<CategoryVO>();
 
-	      conn = ds.getConnection();
+ 		  try {
 
-	      String sql = " select cgno, cgcode, cgname " + " from tbl_category ";
+			  conn = ds.getConnection();
 
-	      pstmt = conn.prepareStatement(sql);
+			  String sql = " select cgno, cgcode, cgname " + " from tbl_category ";
 
-	      rs = pstmt.executeQuery(); // select 되어진 결과를 resultSet에 받는다.
+			  pstmt = conn.prepareStatement(sql);
 
-	      while (rs.next()) {
+			  rs = pstmt.executeQuery(); // select 되어진 결과를 resultSet에 받는다.
 
-	         CategoryVO categvo = new CategoryVO();
-	         categvo.setCgno(rs.getInt(1));
-	         categvo.setCgcode(rs.getString(2));
-	         categvo.setCgname(rs.getString(3));
+			  while (rs.next()) {
 
-	         categoryList.add(categvo); // imageList에 imgvo를 보내준다.
+				  CategoryVO categvo = new CategoryVO();
+				  categvo.setCgno(rs.getInt(1));
+				  categvo.setCgcode(rs.getString(2));
+				  categvo.setCgname(rs.getString(3));
 
-	      } // end of while(rs.next()) ---------------------------
+				  categoryList.add(categvo); // imageList에 imgvo를 보내준다.
 
-	      return categoryList;
+			  } // end of while(rs.next()) ---------------------------
+
+		    }
+		    finally {
+			close();
+		    }
+
+		return categoryList;
 	   }
 
-	   // 카테고리 목록 클릭시 카테고리 코드에 따라 조회 및 정렬하는 메소드(JIEUN)
-	   @Override
-	   public List<ProductVO> categoryProducClickSelectAll(Map<String, String> paraMap) throws SQLException {
+	// 카테고리 목록 클릭시 카테고리 코드에 따라 조회 및 정렬하는 메소드(JIEUN)
+	@Override
+	public List<ProductVO> categoryProducClickSelectAll(Map<String, String> paraMap) throws SQLException {
 
-	      List<ProductVO> categoryProducClickList = new ArrayList<ProductVO>();
+		List<ProductVO> categoryProducClickList = new ArrayList<ProductVO>();
 
-	      try {
+		try {
 
-	         conn = ds.getConnection();
+			conn = ds.getConnection();
 
-	         String sql = " select pdno, pdname, pdcategory_fk, pdimage2, price, saleprice, pdgender "
-	                  + " from tbl_product ";
-	         
-	         if (paraMap.get("sort") == null) {
-	            // 정렬타입이 없는 경우
+			String sql = " select pdno, pdname, pdcategory_fk, pdimage2, price, saleprice, pdgender "; 
 
-	            // System.out.println("정렬이 null 인경우 /////");
+			if ("sortHighPrice".equals(paraMap.get("sort"))) {
+				// 정렬 중 sortHighPrice 클릭 시 (높은 가격)
 
-	            if ("1".equals(paraMap.get("gender"))) {
-	               System.out.println("정렬이 null 이면서 성별이 남자 인 경우");
+				sql += " from tbl_product "
+					 + "where pdgender = ? and pdcategory_fk = ? "
+					 + " order by saleprice desc ";
+			} else if ("sortLowPrice".equals(paraMap.get("sort"))) {
+				// 정렬 중 sortLowPrice 클릭 시 (낮은 가격)
 
-	               sql += " where pdgender = ? and pdcategory_fk = ? ";
-	            } else {
-	               // 여자
+				sql += " from tbl_product "
+					 + " where pdgender = ? and pdcategory_fk = ? "
+					 + " order by saleprice asc ";
+			} else if ("sortNewProduct".equals(paraMap.get("sort"))) {
+				// 정렬 중 sortNewProduct 클릭 시 (신상품)
 
-	               System.out.println("정렬이 null 이면서 성별이 여자 인 경우");
-	               sql += " where pdgender = ? and pdcategory_fk = ? ";
-	            }
-	         }
-	         else {
-	            // 정렬이 있는 경우
+				sql += " from tbl_product "
+					 + " where pdgender = ? and pdcategory_fk = ? and pdinputdate >= (sysdate - 31)";
+			}
+			else if("sortBestProduct".equals(paraMap.get("sort"))) {
+				// 정렬 중 sortBestProduct 클릭 시 (인기상품)
+				
+				sql += " , nvl(ordersum,0) as ordersum "
+						 + " from tbl_product " 
+						 + " left join " 
+						 + " ( " 
+						 + "	select pdno_fk, ordersum " 
+						 + "    from view_ordercodedetail " 
+						 + " )N " 
+						 + " on pdno = N.pdno_fk "
+						 + " where pdgender = ? and pdcategory_fk = ? "
+						 + " order by ordersum desc ";					
+				
+			}
+			
+			else {
+				
+				if("0".equals(paraMap.get("pdcategory_fk"))) {
+					// 카테고리를 전체(0)을 클릭한 경우
+					sql += "from tbl_product "
+						 + " where pdgender = ? "; 
+					
+				}
+				else {
+					// 카테고리 전체 제외한 것 클릭한 경우
+					sql += " from tbl_product "
+						 + " where pdgender = ? and pdcategory_fk = ? ";
+				}
+			}			
 
-	            System.out.println("정렬이 있는경우 ~~~~~");
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			
+			if ("sortHighPrice".equals(paraMap.get("sort"))) {
+				// 정렬 중 sortHighPrice 클릭 시 (높은 가격)
 
-	            if ("1".equals(paraMap.get("gender"))) {
-	               // 남자 페이지
-	               System.out.println("정렬이 있고 gender값이 남자인 경우 ");
+				pstmt.setString(1, paraMap.get("gender"));
+				pstmt.setString(2, paraMap.get("pdcategory_fk"));					
+			} else if ("sortLowPrice".equals(paraMap.get("sort"))) {
+				// 정렬 중 sortLowPrice 클릭 시 (낮은 가격)
+				pstmt.setString(1, paraMap.get("gender"));
+				pstmt.setString(2, paraMap.get("pdcategory_fk"));
+			} else if ("sortNewProduct".equals(paraMap.get("sort"))) {
+				// 정렬 중 sortNewProduct 클릭 시 (신상품)
+				pstmt.setString(1, paraMap.get("gender"));
+				pstmt.setString(2, paraMap.get("pdcategory_fk"));
+			}
+			else if("sortBestProduct".equals(paraMap.get("sort"))) {
+				// 정렬 중 sortBestProduct 클릭 시 (인기상품)
+				pstmt.setString(1, paraMap.get("gender"));
+				pstmt.setString(2, paraMap.get("pdcategory_fk"));			
+			}
+			else {
+				if("0".equals(paraMap.get("pdcategory_fk"))) {
+					pstmt.setString(1, paraMap.get("gender"));
+				}
+				else {
+					pstmt.setString(1, paraMap.get("gender"));
+					pstmt.setString(2, paraMap.get("pdcategory_fk"));
+				}
+			}			
+		
+			rs = pstmt.executeQuery();
 
-	               if ("sortHighPrice".equals(paraMap.get("sort"))) {
-	                  // 정렬 중 sortHighPrice 클릭 시 (높은 가격)
+			while (rs.next()) {
 
-	                  System.out.println("정렬이 있고 gender값이 남자이고 정렬타입이 sortHighPrice 인 경우 ");
+				ProductVO pdvo = new ProductVO();
+				pdvo.setPdno(rs.getInt(1));
+				pdvo.setPdname(rs.getString(2));
+				pdvo.setPdcategory_fk(rs.getString(3));
+				pdvo.setPdimage2(rs.getString(4));
+				pdvo.setPrice(rs.getInt(5));
+				pdvo.setSaleprice(rs.getInt(6));
+				pdvo.setPdgender(rs.getString(7));
 
-	                  sql += " where pdgender = ? and pdcategory_fk = ? "
-	                      + " order by saleprice desc ";
-	               } else if ("sortLowPrice".equals(paraMap.get("sort"))) {
-	                  // 정렬 중 sortLowPrice 클릭 시 (낮은 가격)
+				categoryProducClickList.add(pdvo);
 
-	                  System.out.println("정렬이 있고 gender값이 남자이고 정렬타입이 sortLowPrice 인 경우 ");
+			}
 
-	                  sql += " where pdgender = ? and pdcategory_fk = ? "
-	                      + " order by saleprice asc ";
-	               } else if ("sortNewProduct".equals(paraMap.get("sort"))) {
-	                  // 정렬 중 sortNewProduct 클릭 시 (신상품)
+		} finally {
+			close();
+		}
 
-	                  System.out.println("정렬이 있고 gender값이 남자이고 정렬타입이 sortNewProduct 인 경우 ");
-
-	                  sql += " where pdgender = ? and pdcategory_fk = ? and pdinputdate >= (sysdate - 31)";
-	               } else {
-	                  ;
-	               }
-	            } 
-	            else {
-	               // 여자 메인페이지
-	               System.out.println("정렬이 있고 gender값이 여자인 경우 ");
-
-	               if ("sortHighPrice".equals(paraMap.get("sort"))) {
-	                  // 정렬 중 sortHighPrice 클릭 시 (높은 가격)
-
-	                  System.out.println("정렬이 있고 gender값이 여자이고 정렬타입이 sortHighPrice 인 경우 ");
-
-	                  sql += " where pdgender = ? and pdcategory_fk = ? "
-	                      + " order by saleprice desc ";
-	               } else if ("sortLowPrice".equals(paraMap.get("sort"))) {
-	                  // 정렬 중 sortLowPrice 클릭 시 (낮은 가격)
-	                  System.out.println("정렬이 있고 gender값이 여자이고 정렬타입이 sortLowPrice 인 경우 ");
-
-	                  sql += " where pdgender = ? and pdcategory_fk = ? "
-	                      + " order by saleprice asc ";
-	               } else if ("sortNewProduct".equals(paraMap.get("sort"))) {
-	                  // 정렬 중 sortNewProduct 클릭 시 (신상품)
-	                  System.out.println("정렬이 있고 gender값이 여자이고 정렬타입이 sortNewProduct 인 경우 ");
-
-	                  sql += " where pdgender = ? and pdcategory_fk = ? and pdinputdate >= (sysdate - 31)";
-	               } else {
-	                  ;
-	               }
-	            } // 여자메인페이지 끝-----------------------------
-
-	         } // 정렬이 있는 경우 끝--------------------------------
-
-	         pstmt = conn.prepareStatement(sql);
-
-	         if (paraMap.get("sort") == null) {
-	            // 정렬타입이 없는 경우
-
-	            if ("1".equals(paraMap.get("gender"))) {
-	               pstmt.setString(1, paraMap.get("gender"));
-	               pstmt.setString(2, paraMap.get("pdcategory_fk"));
-
-	            } else {
-	               // 여자
-	               pstmt.setString(1, paraMap.get("gender"));
-	               pstmt.setString(2, paraMap.get("pdcategory_fk"));
-	            }
-	         } else {
-	            // 정렬이 있는 경우
-	            if ("1".equals(paraMap.get("gender"))) {
-	               // 남자 페이지
-	               if ("sortHighPrice".equals(paraMap.get("sort"))) {
-	                  // 정렬 중 sortHighPrice 클릭 시 (높은 가격)
-	                  pstmt.setString(1, paraMap.get("gender"));
-	                  pstmt.setString(2, paraMap.get("pdcategory_fk"));
-	               } else if ("sortLowPrice".equals(paraMap.get("sort"))) {
-	                  // 정렬 중 sortLowPrice 클릭 시 (낮은 가격)
-	                  pstmt.setString(1, paraMap.get("gender"));
-	                  pstmt.setString(2, paraMap.get("pdcategory_fk"));
-	               } else if ("sortNewProduct".equals(paraMap.get("sort"))) {
-	                  // 정렬 중 sortNewProduct 클릭 시 (신상품)
-	                  pstmt.setString(1, paraMap.get("gender"));
-	                  pstmt.setString(2, paraMap.get("pdcategory_fk"));
-	               } else {
-	                  ;
-	               }
-	            } 
-	            else {
-	               // 여자 메인페이지
-	               if ("sortHighPrice".equals(paraMap.get("sort"))) {
-	                  // 정렬 중 sortHighPrice 클릭 시 (높은 가격)
-	                  pstmt.setString(1, paraMap.get("gender"));
-	                  pstmt.setString(2, paraMap.get("pdcategory_fk"));
-
-	               } else if ("sortLowPrice".equals(paraMap.get("sort"))) {
-	                  // 정렬 중 sortLowPrice 클릭 시 (낮은 가격)
-	                  pstmt.setString(1, paraMap.get("gender"));
-	                  pstmt.setString(2, paraMap.get("pdcategory_fk"));
-	               } else if ("sortNewProduct".equals(paraMap.get("sort"))) {
-	                  // 정렬 중 sortNewProduct 클릭 시 (신상품)
-	                  pstmt.setString(1, paraMap.get("gender"));
-	                  pstmt.setString(2, paraMap.get("pdcategory_fk"));
-	               } else {
-	                  ;
-	               }
-	            } // 여자메인페이지 끝-----------------------------
-
-	         }
-
-	         rs = pstmt.executeQuery();
-
-	         while (rs.next()) {
-
-	            ProductVO pdvo = new ProductVO();
-	            pdvo.setPdno(rs.getInt(1));
-	            pdvo.setPdname(rs.getString(2));
-	            pdvo.setPdcategory_fk(rs.getString(3));
-	            pdvo.setPdimage2(rs.getString(4));
-	            pdvo.setPrice(rs.getInt(5));
-	            pdvo.setSaleprice(rs.getInt(6));
-	            pdvo.setPdgender(rs.getString(7));
-
-	            categoryProducClickList.add(pdvo);
-
-	         }
-
-	      } finally {
-	         close();
-	      }
-
-	      return categoryProducClickList;
-	   }
+		return categoryProducClickList;
+	}
 	      
 	   // =========== 상품 관련 메소드 ============ // 
 	   
@@ -623,19 +577,12 @@ public class ProductDAO implements InterProductDAO {
 	         
 	         if( "1".equals(paraMap.get("pdgender")) || "2".equals(paraMap.get("pdgender")) ) {
 	            // 성별이 여자 또는  남자라면
-	            System.out.println("성별이 여자 또는 남자");
-	            
-	            if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
+
+		       if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
 	               // 검색 키워드(검색명)가 없을때 (전체 검색)
-	               System.out.println("성별이 여자 또는 남자이고 검색 키워드가 없다");
-	               System.out.println("성별 ==>  " + paraMap.get("pdgender"));
-	               System.out.println("검색 타입 ==>  " + paraMap.get("searchType"));
-	               System.out.println("검색 키워드 ==>  " + paraMap.get("searchWord"));   
 	               
 	               if("week".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 일주일 이라면
-	                  
-	                  System.out.println("성별이 여자 또는 남자이고 검색 키워드가 없고 상품등록일이 일주일이라면~~~~");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -644,15 +591,12 @@ public class ProductDAO implements InterProductDAO {
 	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 한달 이라면
 	                  
-	                  System.out.println("성별이 여자 또는 남자이고 검색 키워드가 없고 상품등록일이 한달이라면");               
-	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
 	                          " where p.pdgender = ? and " + prodRegType;                     
 	               }
 	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 세달 이라면
-	                  System.out.println("성별이 여자 또는 남자이고 검색 키워드가 없고 상품등록일이 세달이라면");               
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -660,7 +604,6 @@ public class ProductDAO implements InterProductDAO {
 	               }
 	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 여섯달 이라면
-	                  System.out.println("성별이 여자 또는 남자이고 검색 키워드가 없고 상품등록일이 6달이라면");            
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -669,7 +612,6 @@ public class ProductDAO implements InterProductDAO {
 	               }
 	               else if("year".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 일년 이라면
-	                  System.out.println("성별이 여자 또는 남자이고 검색 키워드가 없고 상품등록일이 1년 이라면");            
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -678,7 +620,6 @@ public class ProductDAO implements InterProductDAO {
 	               }
 	               else {
 	                  // 상품등록일이 전체이라면(조건없음)
-	                  System.out.println("성별이 여자 또는 남자이고 검색 키워드가 없고 상품등록일이 전체");               
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -690,11 +631,9 @@ public class ProductDAO implements InterProductDAO {
 	            
 	            else {
 	               // 검색 키워드(검색명)가 있을때
-	               System.out.println("성별이 여자 또는 남자이고 검색 키워드가 있다 ");
 	               
 	               if("week".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 일주일 이라면
-	                  System.out.println("성별이 여자 또는 남자이고 검색 키워드가 있고 상품등록일이 일주일이라면");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -703,15 +642,12 @@ public class ProductDAO implements InterProductDAO {
 	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 한달 이라면
 	                  
-	                  System.out.println("성별이 여자 또는 남자이고 검색 키워드가 있고 상품등록일이 한달이라면");
-	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
 	                          " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
 	               }
 	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 세달 이라면
-	                  System.out.println("성별이 여자 또는 남자이고 검색 키워드가 있고 상품등록일이 3달이라면");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -719,7 +655,6 @@ public class ProductDAO implements InterProductDAO {
 	               }
 	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 여섯달 이라면
-	                  System.out.println("성별이 여자 또는 남자이고 검색 키워드가 있고 상품등록일이 6달이라면");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -727,7 +662,6 @@ public class ProductDAO implements InterProductDAO {
 	               }
 	               else if("year".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 일년 이라면
-	                  System.out.println("성별이 여자 또는 남자이고 검색 키워드가 있고 상품등록일이 12달이라면");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -735,7 +669,6 @@ public class ProductDAO implements InterProductDAO {
 	               }
 	               else {
 	                  // 상품등록일이 전체이라면(조건없음)
-	                  System.out.println("성별이 여자 또는 남자이고 검색 키워드가 있고 상품등록일이 전체이라면");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -748,15 +681,12 @@ public class ProductDAO implements InterProductDAO {
 	         }
 	         else {
 	            // 성별이 전체라면
-	            System.out.println("성별이 전체");
 	            
 	            if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
 	               // 검색 키워드(검색명)가 없을때 (전체 검색)
-	               System.out.println("성별이 전체이고 검색 키워드가 없다");
 	               
 	               if("week".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 일주일 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 일주일이라면");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -764,7 +694,6 @@ public class ProductDAO implements InterProductDAO {
 	               }
 	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 한달 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 1달이라면");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -773,14 +702,12 @@ public class ProductDAO implements InterProductDAO {
 	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 세달 이라면
 	                  
-	                  System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 3달이라면");
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
 	                          " where " + prodRegType;
 	               }
 	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 여섯달 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 6달이라면");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -789,7 +716,6 @@ public class ProductDAO implements InterProductDAO {
 	               }
 	               else if("year".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 일년 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 12달이라면");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -798,7 +724,6 @@ public class ProductDAO implements InterProductDAO {
 	               }
 	               else {
 	                  // 상품등록일이 전체이라면(조건없음)
-	                  System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 전체이라면");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno ";
@@ -809,11 +734,9 @@ public class ProductDAO implements InterProductDAO {
 	            
 	            else {
 	               // 검색 키워드(검색명)가 있을때
-	               System.out.println("성별이 전체이고 검색 키워드가 있다");
 	               
 	               if("week".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 일주일 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 일주일이라면");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -821,7 +744,6 @@ public class ProductDAO implements InterProductDAO {
 	               }
 	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 한달 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 한달이라면");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -829,7 +751,6 @@ public class ProductDAO implements InterProductDAO {
 	               }
 	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 세달 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 3달이라면");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -837,7 +758,6 @@ public class ProductDAO implements InterProductDAO {
 	               }
 	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 여섯달 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 6달이라면");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -845,7 +765,6 @@ public class ProductDAO implements InterProductDAO {
 	               }
 	               else if("year".equals(paraMap.get("prodRegType")) ) {
 	                  // 상품등록일이 일년 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 12이라면");
 	                  
 	                  sql +=  " from tbl_product p join tbl_category c "+
 	                        " on p.pdcategory_fk = c.cgno " +      
@@ -2052,10 +1971,9 @@ public class ProductDAO implements InterProductDAO {
 			
 			conn = ds.getConnection();
 			
+			 String sql = " UPDATE tbl_product SET pdcategory_fk = ?, pdname = ? ";
 			
-			// (pdno, pdname, pdcategory_fk, pdimage1, pdimage2, pdqty, price, saleprice, pdcontent, point, texture, pdgender)
-			
-			// String sql = " UPDATE tbl_product SET pdcategory_fk = ?, pdname = ? ";
+			/*
 			String sql = " UPDATE tbl_product "
 					   + " SET pdcategory_fk = ?, pdname = ? , pdqty = ?, price = ?, saleprice = ?, "
 					   + " pdcontent = ?, texture = ?, pdgender = ? "
@@ -2073,14 +1991,16 @@ public class ProductDAO implements InterProductDAO {
 			pstmt.setString(8, pvo.getPdgender());
 			pstmt.setInt(9, pvo.getPdno());
 			
-			
-			/*
+			*/
+			 
 			if(  !"".equals(pvo.getPdimage1()) ||  !"".equals(pvo.getPdimage2())) {
 				// 제품이미지1, 2가 null값이 아닌 경우에 
 				sql += " , pdimage1 = ?, pdimage2 = ?, pdqty = ?, price = ?, saleprice = ?, pdcontent = ?, texture = ?, pdgender = ? ";
+				System.out.println("이미지 ==> " + pvo.getPdimage1());
 			}
 			else {
 				sql += " , pdqty = ?, price = ?, saleprice = ?, pdcontent = ?, texture = ?, pdgender = ? ";
+				System.out.println("이미지가 없는 경우==> " + pvo.getPdimage2());
 			}
 			
 			sql += " where pdno = ? ";
@@ -2116,7 +2036,6 @@ public class ProductDAO implements InterProductDAO {
 				
 			}
 			
-			*/
 			
 			result = pstmt.executeUpdate();
 			
@@ -2310,7 +2229,66 @@ public class ProductDAO implements InterProductDAO {
 		return infoMap;	
 		
 	}	
-	
+
+	// 관리자 페이지에서 주문 리스트 가져오는(select) 메소드
+	@Override
+	public List<OrderDetailVO> adminOrderListAll() throws SQLException {
+		
+		List<OrderDetailVO> orderDetailList = new ArrayList<OrderDetailVO>();
+		
+		try {
+			
+			conn = ds.getConnection();
+			
+			String sql = " select odrseqnum, fk_odrcode, o.odrdate, m.name, p.pdname, odrprice, deliverstatus, deliverdate "+
+					" from tbl_orderdetail od join tbl_order o "+
+					" on od.fk_odrcode = o.odrcode "+
+					" join tbl_member m "+
+					" on o.userid_fk = m.userid "+
+					" join tbl_product p "+
+					" on p.pdno = od.fk_pinfono "+
+					" order by odrdate desc ";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				
+				OrderDetailVO orderDetailvo = new OrderDetailVO();
+				
+				orderDetailvo.setOdrseqnum(rs.getInt(1));
+				orderDetailvo.setFk_odrcode(rs.getNString(2));
+				
+				OrderVO ordervo = new OrderVO();
+				
+				ordervo.setOdrdate(rs.getString(3));
+				orderDetailvo.setOrdervo(ordervo);
+				
+				MemberVO membervo = new MemberVO();
+				membervo.setName(rs.getString(4));
+				orderDetailvo.setMembervo(membervo);			
+				
+				ProductVO productvo = new ProductVO();
+				productvo.setPdname(rs.getString(5));				
+				orderDetailvo.setProductvo(productvo);
+				
+				orderDetailvo.setOdrprice(rs.getInt(6));
+				orderDetailvo.setDeliverstatus(rs.getInt(7));
+				orderDetailvo.setDeliverdate(rs.getString(8));
+
+				orderDetailList.add(orderDetailvo);
+
+			}
+			
+			
+		} 
+		finally {
+			close();
+		}
+		
+		return orderDetailList;
+	}	
 	
 
 		////////////////////////////////////////////////////////////김민아//////////////////////////////////////////////////////////////////////
