@@ -3151,31 +3151,9 @@ public class ProductDAO implements InterProductDAO {
 		return cartList;
 	}
 	
+	// 장바구니 비우기 버튼 메서드(동휘)
 	@Override
-	public void productAllDelete(int pdno, String userid_fk) throws SQLException {
-		
-		try {
-			conn = ds.getConnection(); // DBCP에서 connection 받아오기
-			
-			String sql = " delete from TBL_CART where userid_fk = ? and pdno_fk = ? ";
-			
-			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
-			
-			//pstmt.setString(1, userid_fk);
-			pstmt.setInt(2, pdno);
-			pstmt.setString(1, "siasia");
-			
-			int n = pstmt.executeUpdate();
-			
-		} finally {
-			close();
-		}
-		
-	}
-	
-	// 상품 개별삭제 버튼을 누를경우 유저의 ID와 해당 제품의 번호를 받아와 DB테이블에서 삭제해주는 메서드
-	@Override
-	public int productOneDelete(String pdno, String userid_fk) throws SQLException {
+	public int productAllDelete(int pdno, String userid_fk) throws SQLException {
 		
 		int result = 0;
 		
@@ -3187,8 +3165,35 @@ public class ProductDAO implements InterProductDAO {
 			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
 			
 			//pstmt.setString(1, userid_fk);
-			pstmt.setString(1, "siasia");
-			pstmt.setString(2, pdno);
+			pstmt.setInt(2, pdno);
+			pstmt.setString(1, userid_fk);
+			
+			int n = pstmt.executeUpdate();
+			
+		} finally {
+			close();
+		}
+		
+		return result;
+		
+	}
+	
+	// 상품 개별삭제 버튼을 누를경우 유저의 ID와 해당 제품의 번호를 받아와 DB테이블에서 삭제해주는 메서드
+	@Override
+	public int productOneDelete(String pinfono, String userid_fk) throws SQLException {
+		
+		int result = 0;
+		
+		try {
+			conn = ds.getConnection(); // DBCP에서 connection 받아오기
+			
+			String sql = " delete from TBL_CART where userid_fk = ? and PINFONO = ? ";
+			
+			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+			
+			//pstmt.setString(1, userid_fk);
+			pstmt.setString(1, userid_fk);
+			pstmt.setString(2, pinfono);
 			
 			result = pstmt.executeUpdate();
 			
@@ -3199,28 +3204,35 @@ public class ProductDAO implements InterProductDAO {
 		return result;
 	}
 	
+	// 선택된 상품들 삭제메서드(동휘)
 	@Override
-	public void productChoiceDelete(int pdno, String userid_fk) throws SQLException {
+	public int productChoiceDelete(int Pinfono, String userid_fk) throws SQLException {
+		
+		int result = 0;
 		
 		try {
 			conn = ds.getConnection(); // DBCP에서 connection 받아오기
 			
-			String sql = " delete from TBL_CART where userid_fk = ? and pdno_fk = ? ";
+			String sql = " delete from TBL_CART where userid_fk = ? and Pinfono = ? ";
 			
 			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
 			
 			//pstmt.setString(1, userid_fk);
-			pstmt.setString(1, "siasia");
-			pstmt.setInt(2, pdno);
+			pstmt.setString(1, userid_fk);
+			pstmt.setInt(2, Pinfono);
 			
-			pstmt.executeUpdate();
+			result = pstmt.executeUpdate();
 			
 		} finally {
 			close();
 		}
 		
+		return result;
+		
 	}
 	
+	// 사이즈와 색상정보는 product 테이블이 아닌 product_info 테이블에 있기때문에 
+	// 장바구니 화면에 출력할 상품들의 정보를 받아온다. ( 동휘 )
 	@Override
 	public List<ProductInfoVO> getSizeAndColor(String userid) throws SQLException {
 		
@@ -3261,25 +3273,71 @@ public class ProductDAO implements InterProductDAO {
 		return productInfoList;
 	}
 	
+	// (트랜젝션) - 주문을 완료하는 경우 일어나는 일련의 행위들 (동휘)
+	// 1. 주문테이블 insert -> 2. 주문테이블에서 받아온 주문코드를 주문상세테이블로 전달 -> 3. 주문상세테이블 insert ->
+	// 4. 장바구니테이블의 데이터삭제 (주문을 했기때문에 더이상 장바구니에는 필요없음)
+	// 5. 유저 테이블의 주문을 시킨 유저의 Point 변화 ( 주문포인트만큼 추가, 사용포인트만큼 감소)
 	@Override
 	public String RecordOrder(Map<String, String> paraMap) throws SQLException {
 		
 		String result = "";
 		
 		try {
-			
+			// 주문테이블에 해당 상품의 데이터를 기입한다.
 			conn = ds.getConnection(); // DBCP에서 connection 받아오기
 			
-			String sql = " delete from TBL_CART where userid_fk = ? ";
+			String sql = " insert into tbl_order(odrcode, userid_fk, ODRTOTALPRICE, ODRTOTALPOINT) "
+					   + " values (?,?,?,?) ";
+			
+			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+			
+			pstmt.setString(1,paraMap.get("ordCode"));
+			pstmt.setString(2,paraMap.get("userid_fk"));
+			pstmt.setString(3,paraMap.get("finalPrice"));
+			pstmt.setString(4,paraMap.get("addPoint"));
+			
+			pstmt.executeUpdate();
+			
+			//==================================================================================//
+			// 주문코드를 받아온다. ( 주문코드가 주문상세의 Foreign Key이기 때문에 필요하다. )
+			sql = " select odrcode "+
+				  " from "+
+				  " ( "+
+				  " select odrcode, userid_fk, ODRTOTALPRICE, ODRTOTALPOINT, ODRDATE "+
+				  " from tbl_order "+
+				  " where userid_fk = ? "+
+				  " order by ODRDATE desc "+
+				  " )v "+
+				  " where rownum = 1 ";
 			
 			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
 			
 			pstmt.setString(1, paraMap.get("userid_fk"));
 			
-			pstmt.executeUpdate();
+			rs = pstmt.executeQuery();
+			
+			rs.next();
+			
+			String odrcode = rs.getString(1); 
 			
 			//==================================================================================//
+			// order_detail 테이블에 상품의 정보를 기입한다.
 			
+			  sql = " insert into TBL_ORDERDETAIL(ODRSEQNUM, FK_ODRCODE, FK_PINFONO, OQTY, ODRPRICE, DELIVERSTATUS) "
+				  + " values (seq_tbl_orderdetail.nextval,?,?,?,?,?) ";
+			  
+			  pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+			  
+			  pstmt.setString(1, odrcode);
+			  pstmt.setString(2, paraMap.get("pinfono"));
+			  pstmt.setString(3, paraMap.get("productamount"));
+			  pstmt.setString(4, paraMap.get("price"));
+			  pstmt.setString(5, "1");
+			  
+			  pstmt.executeUpdate();
+			
+			//==================================================================================//
+			// 주문을 했기때문에 장바구니 테이블에 주문된 상품들의 데이터를 삭제
 			sql = " delete from TBL_CART where userid_fk = ? ";
 			
 			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
@@ -3289,41 +3347,41 @@ public class ProductDAO implements InterProductDAO {
 			pstmt.executeUpdate();
 			
 			//==================================================================================//
-			
-			System.out.println("1");
-			
-			sql = " insert into tbl_order(odrcode, userid_fk, ODRTOTALPRICE, ODRTOTALPOINT) "
-					+ " values (seq_tbl_order.nextval,?,?,?) ";
+			// 유저 테이블에 사용된 포인트만큼 감소
+			sql = "update TBL_member set POINT = (POINT-?) where USERID = ?";
 			
 			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
 			
-			pstmt.setString(1,paraMap.get("userid_fk"));
-			pstmt.setString(2,paraMap.get("finalPrice"));
-			pstmt.setString(3,paraMap.get("addPoint"));
+			pstmt.setString(1, paraMap.get("usePoint"));
+			pstmt.setString(2, paraMap.get("userid_fk"));
 			
 			pstmt.executeUpdate();
 			
 			//==================================================================================//
-			
-			sql = " select to_char(ODRDATE,'yyyy-mm-dd hh24') "+
-					" from "+
-					" ( "+
-					" select * "+
-					" from tbl_order "+
-					" where userid_fk = ? "+
-					" order by odrdate desc "+
-					" ) "+
-					" where rownum = 1 ";
+			// 유저의 포인트를 결제된 상품의 가산포인트만큼 추가
+			sql = "update TBL_member set POINT = (POINT+?) where USERID = ?";
 			
 			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
 			
-			pstmt.setString(1,paraMap.get("userid_fk"));
+			pstmt.setString(1, paraMap.get("addPoint"));
+			pstmt.setString(2, paraMap.get("userid_fk"));
 			
-			rs = pstmt.executeQuery();
+			pstmt.executeUpdate();
 			
-			while(rs.next()) {
-				result = rs.getString(1);
-			}
+			// 혹시 모르기때문에 가만 두시오.
+			/* 
+			 * sql = " select to_char(ODRDATE,'yyyy-mm-dd hh24') "+ " from "+ " ( "+
+			 * " select * "+ " from tbl_order "+ " where userid_fk = ? "+
+			 * " order by odrdate desc "+ " ) "+ " where rownum = 1 ";
+			 * 
+			 * pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+			 * 
+			 * pstmt.setString(1,paraMap.get("userid_fk"));
+			 * 
+			 * rs = pstmt.executeQuery();
+			 * 
+			 * while(rs.next()) { result = rs.getString(1); }
+			 */
 		} finally {
 			close();
 		}
@@ -3331,6 +3389,7 @@ public class ProductDAO implements InterProductDAO {
 		return result;
 	}
 	
+	// 주문완료페이지에 주문정보(tbl_order)를 받아서 전송해주는 메서드(동휘)
 	@Override
 	public OrderVO getOrderInfo(String userid) throws SQLException{
 		
@@ -3340,9 +3399,9 @@ public class ProductDAO implements InterProductDAO {
 			conn = ds.getConnection(); // DBCP에서 connection 받아오기
 			
 			String sql = " select ODRCODE, USERID_FK, ODRTOTALPRICE, ODRTOTALPOINT, ODRDATE "+
-					" from tbl_order "+
-					" where USERID_FK = ? "+
-					" order by ODRDATE desc ";
+						 " from tbl_order "+
+						 " where USERID_FK = ? "+
+						 " order by ODRDATE ";
 			
 			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
 			
