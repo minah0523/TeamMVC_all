@@ -540,17 +540,21 @@
 	function productAllDelete(){
 		
 		// ajax를 이용하여 장바구니 테이블에서 해당 유저의 선택된 상품 행을 삭제한다.
-        var arrPdno = new Array();
+        var arrPinfono = new Array();
 		
-		 <c:forEach var="pvo" items="${cartList}">
-		   arrPdno.push('${pvo.pdno}'); 
-		 </c:forEach>
-		 
-		 var para_pdnoes = arrPdno.join(","); // "1,1,1,1,2,3,4"
+        var datalength = $("div.data").length;
+		
+        for(var i=0; i<datalength; i++) {
+    		var pinfono = $("input:hidden[name=pinfono]").eq(i).val();
+    		
+    		arrPinfono.push(pinfono);	
+    	}
+		
+		 var para_pdnoes = arrPinfono.join(","); // "1,1,1,1,2,3,4"
 	 //  alert(para_pdnoes);
 	
 		
-		var para_data = {"pdnoes":para_pdnoes,"userid_fk":'${sessionScope.loginuser.userid}'};
+		var para_data = {"pinfonos":para_pdnoes,"userid_fk":'${sessionScope.loginuser.userid}'};
 		
 		$.ajax({
 	         url:"/TeamMVC/product/productAllDelete.neige", 
@@ -569,17 +573,18 @@
 	
 	function productOneDelete(index) {
 		
+		var index = $("input:hidden[name=pinfono]").index();
+		
 		var pinfono = $("input:hidden[name=pinfono]").eq(index).val();
 		
-		alert(pinfono);
+		var userid = '${sessionScope.loginuser.userid}';
 		
 		$.ajax({
 			url : "/TeamMVC/product/productOneDelete.neige",
 			type : "POST",
-			data : {"pdno":pdno,"userid":'${sessionScope.loginuser.userid}'},
+			data : {"pinfono":pinfono,"userid":userid},
 			dataType : "JSON",
 			success : function(json) {
-				alert("success");
 			},
 			error : function(request, status, error) {
 				alert("code: " + request.status + "/n" + "message: "
@@ -591,23 +596,23 @@
 	
 	function productChoiceDelete() {
 		
-		var arrPdno = new Array();
+		var arrPinfono = new Array();
 		
 		var datalength = $("div.data").length;
 		
 		for(var i=0; i<datalength; i++) {
     		var chk = $("input:checkbox[name=buy]").eq(i).is(":checked");
 			
-    		var pdno = $("input:hidden[name=pdno]").eq(i).val();
+    		var pinfono = $("input:hidden[name=pinfono]").eq(i).val();
     		
     		if(chk) { 
-    			arrPdno.push(pdno);	
+    			arrPinfono.push(pinfono);	
 			}
     	}
 		
-		var para_pdnoes = arrPdno.join(","); // "1,1,1,1,2,3,4"
+		var para_Pinfono = arrPinfono.join(","); // "1,1,1,1,2,3,4"
 		
-		var para_data = {"pdnoes":para_pdnoes, "userid_fk":'${sessionScope.loginuser.userid}'};
+		var para_data = {"Pinfonos":para_Pinfono , "userid_fk":'${sessionScope.loginuser.userid}'};
 		
 		$.ajax({
 			 url:"/TeamMVC/product/productChoiceDelete.neige", 
@@ -615,7 +620,6 @@
 	         data:para_data, 
 	         dataType:"JSON",
 	         success:function(){
-	            alert("success");
 	         },
 	         error: function(request, status, error){
 	            alert("code: "+request.status+"/n"+"message: "+request.responseText+"/n"+"error: "+error);
@@ -636,6 +640,28 @@
 			return false;
 		}
 		
+		var name = $("input#name").val();
+		var postcode = $("input#postcode").val();
+		var detailAddress = $("input#detailAddress").val();
+		var mobile = $("input#mobile").val();
+		
+		if(name.trim() == "") {
+			swal("이름을 입력해 주시기 바랍니다.");
+			return false;
+		}
+		if(postcode.trim() == "") {
+			swal("우편번호를 입력해주시기 바랍니다.");
+			return false;
+		}
+		if(detailAddress.trim() == "") {
+			swal("상세주소를 입력해주시기 바랍니다.");
+			return false;
+		}
+		if(mobile.trim() == "") {
+			swal("연락처를 입력해주시기 바랍니다.");
+			return false;
+		}
+		
 		// 결제URL
 		var url = "/TeamMVC/product/paymentGateway.neige?userid="+userid+"&finalPrice="+finalPrice;
 		
@@ -646,11 +672,35 @@
 	
 	// 전체상품 주문이벤트
 	function productAllOrder(userid) {
-		
+
 		// 전체상품금액
 		var finalPrice = $("input:text[name=sumPrice]").val();
-		
 		var datalength = $("div.data").length;
+		
+		var name = $("input#name").val();
+		var postcode = $("input#postcode").val();
+		var detailAddress = $("input#detailAddress").val();
+		var mobile = $("input#mobile").val();
+		
+		if(name.trim() == "") {
+			swal("이름을 입력해 주시기 바랍니다.");
+			return false;
+		}
+		
+		if(postcode.trim() == "") {
+			swal("우편번호를 입력해주시기 바랍니다.");
+			return false;
+		}
+		
+		if(detailAddress.trim() == "") {
+			swal("상세주소를 입력해주시기 바랍니다.");
+			return false;
+		}
+		
+		if(mobile.trim() == "") {
+			swal("연락처를 입력해주시기 바랍니다.");
+			return false;
+		}
 		
 		for(var i=0; i<datalength; i++) {
 			$("input:checkbox[name=buy]").eq(i).prop('checked', true);
@@ -666,29 +716,36 @@
 	function productOrderRecord(userid, finalPrice) {
 		
 		var arrPinfono = new Array();
+		var arrPrice = new Array();
+		var arrAmount = new Array();
 		
 		var datalength = $("div.data").length;
 		
 		var addPoint = 0
 		
-		var amount = 0;
+		var usePoint = $("input#usePoint").val();
 		
 		for(var i=0; i<datalength; i++) {
     		var chk = $("input:checkbox[name=buy]").eq(i).is(":checked");
 			var productAmount = Number($("input:text[name=amountInput]").eq(i).val());
-			var productpoint = Number($("input:text[name=productpoint]").eq(i).val());
-			
+			var productpoint = Number($("input.productpoint").eq(i).val());
     		var pinfono = $("input:hidden[name=pinfono]").eq(i).val();
+    		var price = $("input.totalprice").eq(i).val();
     		
-    		if(chk) { 
+    		if(chk) {
+    			addPoint += productpoint;
     			arrPinfono.push(pinfono);
-    			
+    			arrPrice.push(price);
+    			arrAmount.push(productAmount);
 			}
     	}
 		
 		var para_pinfono = arrPinfono.join();
+		var prices = arrPrice.join();
+		var amounts = arrAmount.join();
 		
-		var para_data = {"pdnoes":para_pinfono, "userid_fk":userid, "finalPrice":finalPrice, "addPoint":addPoint, "amount":amount};
+		var para_data = {"pinfonos":para_pinfono, "userid_fk":userid, "finalPrice":finalPrice, 
+				"addPoint":addPoint, "usePoint":usePoint, "prices":prices, "amounts":amounts};
 		
 		$.ajax({
 			 url:"/TeamMVC/product/paymentSuccess.neige", 
@@ -802,7 +859,7 @@
 					
 					<!-- 상품 개별 삭제버튼 -->
 					<li class="col-md-1 notimg">
-						<button type="button" name="ondeletebtn" class="btn btn-primary deleteOne" onclick="productOneDelete('${status.index}')" >삭제</button>
+						<button type="button" name="ondeletebtn" class="btn btn-primary deleteOne" onclick="productOneDelete()" >삭제</button>
 					</li>
 					
 					<!-- 상품번호를 받아와 .java로 전송시켜줄 변수를 만든다.
