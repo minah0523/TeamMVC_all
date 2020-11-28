@@ -137,12 +137,10 @@
 		$("li.sort").click(function(){
 			
 			sort = $(this).attr('value');
-			alert("남자 test~~~~ " + sort);
 			
 			var gender = ${sessionScope.gender};
 			location.href="<%= ctxPath%>/ManMain.neige?sort="+sort+"&gender="+gender;			
 			
-			// $("li.sort").children('a').css('font-weight','bold');		
 		});	 	    
 	    
 		
@@ -228,21 +226,42 @@
 
 <%-- 정렬 : 판매순, 가격순, 신상품  --%>
 
-<div id = "Order">
+ <div id = "Order">
 	<div class="col-md-3" id="OrderList" style="margin-left: 1100px;">
 		<ul>
 			<li value= "sortNewProduct" class="sort" id = "sortNewProduct">
-				<a href = "javascript:void(0);"> 신상품 </a> <span class="delimiter">&#124;</span>			
+				<c:if test="${sessionScope.sort eq 'sortNewProduct'}">
+					<a style="font-weight: bold;" href = "javascript:void(0);"> 신상품 </a> <span class="delimiter">&#124;</span>			
+				</c:if>
+				<c:if test="${sessionScope.sort ne 'sortNewProduct'}">
+					<a href = "javascript:void(0);"> 신상품 </a> <span class="delimiter">&#124;</span>			
+				</c:if>				
 			</li>
 			<li value= "sortLowPrice" class="sort" id = "sortLowPrice">
-				<a href = "javascript:void(0);"> 낮은가격 </a> <span class="delimiter">&#124;</span>		
+				<c:if test="${sessionScope.sort eq 'sortLowPrice'}">
+					<a style="font-weight: bold;" href = "javascript:void(0);"> 낮은가격 </a> <span class="delimiter">&#124;</span>			
+				</c:if>
+				<c:if test="${sessionScope.sort ne 'sortLowPrice'}">
+					<a href = "javascript:void(0);"> 낮은가격 </a> <span class="delimiter">&#124;</span>			
+				</c:if>					
 			</li>
 			<li value = "sortHighPrice" class="sort" id= "sortHighPrice">
-				<a href = "javascript:void(0);"> 높은가격 </a> <span class="delimiter">&#124;</span>		
+				<c:if test="${sessionScope.sort eq 'sortHighPrice'}">
+					<a style="font-weight: bold;" href = "javascript:void(0);"> 높은가격 </a> <span class="delimiter">&#124;</span>			
+				</c:if>
+				<c:if test="${sessionScope.sort ne 'sortHighPrice'}">
+					<a href = "javascript:void(0);"> 높은가격 </a> <span class="delimiter">&#124;</span>			
+				</c:if>						
 			</li>			
-			<li value = "sortBestProduct" id ="sortBestProduct">
-				<a href = "<%= ctxPath %>/product/productBestList.neige?gender=${sessionScope.gender}"> 인기상품 </a>					
-			</li>						
+			<li value = "sortBestProduct" class="sort" id ="sortBestProduct">
+				<c:if test="${sessionScope.sort eq 'sortBestProduct'}">
+					<a style="font-weight: bold;" href = "javascript:void(0);"> 인기상품 </a> 
+				</c:if>
+				<c:if test="${sessionScope.sort ne 'sortBestProduct'}">
+					<a href = "javascript:void(0);"> 인기상품 </a>	
+				</c:if>	
+			</li>	
+								
 		</ul>
 	</div>	
 </div>
