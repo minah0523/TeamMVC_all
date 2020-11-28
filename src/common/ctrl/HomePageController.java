@@ -37,12 +37,13 @@ public class HomePageController extends AbstractController {
 		
 		// 성별을 세션 저장
 		session.setAttribute("gender", gender);
-		System.out.println("session값 : " + (String)session.getAttribute("gender"));
 		
 		// (정렬영역 눌르면 받아진다.) 정렬타입도 받아와서 세션에 저장
 		String sort = request.getParameter("sort");
-		System.out.println("sort값은????????????????????? " + sort);
 		
+		// 정렬도 session에 저장해서 어떤 값을 클릭했는지 bold로 보여주자
+		session.setAttribute("sort", sort);
+				
 		// 성별, 정렬 타입 Map에 저장(상품 불러올때 사용됨)
 		Map<String, String> paraMap = new HashMap<String, String>();
 		paraMap.put("gender",gender);
@@ -70,12 +71,6 @@ public class HomePageController extends AbstractController {
 			// 상품정보 리스트를 보여주는 productMainImageList 에 문자열로 된 색상을 넣는다. 
 			pvo.setColores(colores);
 		}
-		
-		/*
-		for(ProductVO pvo : productMainImageList) {
-			System.out.println(pvo.getPdname() + "  =>  " + pvo.getColores());
-		}
-		*/
 		
 		request.setAttribute("productMainImageList", productMainImageList);
 		
