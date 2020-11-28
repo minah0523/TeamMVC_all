@@ -1,7 +1,12 @@
 package member.mdl;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+
+import Payment.mdl.OrderDetailVO;
+import Payment.mdl.OrderVO;
+ 
 
 public interface InterMemberDAO {
 
@@ -39,6 +44,8 @@ public interface InterMemberDAO {
 	//회원리스트의 회원 상세 페이지를 위해 한 회원의 정보를 알아오기(select) 
 	MemberVO memberOneDetail(String userid)throws SQLException;
 	
+	//마이페이지에 필요한 내가 주문한 상품&주문정보 알아오기 (select) 
+	List<OrderDetailVO> selectOrderList(String userid) throws SQLException;
 }
 
 
