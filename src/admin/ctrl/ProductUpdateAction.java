@@ -25,9 +25,6 @@ public class ProductUpdateAction extends AbstractController {
 		MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
 		
 		InterProductDAO pdao = new ProductDAO();
-		
-		// System.out.println("로그인 정보 -==> " + loginuser.getUserid());
-		
 		if( loginuser != null && "admin".equals(loginuser.getUserid())) {
 			
 			String method = request.getMethod();
@@ -45,19 +42,6 @@ public class ProductUpdateAction extends AbstractController {
 				
 				// 관리자페이지의 상품 관리 리스트 중 하나 클릭 했을때 pdno로 데이터를 받아서 조회해서 받아오자
 				ProductVO pvo = pdao.adminProductDetail(pdno);
-				
-				/*
-				String pdname = pvo.getPdname();
-				String pdcategory_fk = pvo.getPdcategory_fk();
-				String pdimage1 = pvo.getPdimage1();
-				String pdimage2 = pvo.getPdimage2();
-				int pdqty = pvo.getPdqty();
-				int price = pvo.getPrice();
-				int saleprice = pvo.getSaleprice();
-				String pdcontent = pvo.getPdcontent();
-				String texture = pvo.getTexture();
-				String pdgender = pvo.getPdgender();
-				*/
 				
 				request.setAttribute("pvo", pvo);
 				
@@ -101,18 +85,6 @@ public class ProductUpdateAction extends AbstractController {
 				// 객체를 문자열로 변환
 				String sPcolor = String.join(",", linkedHashSetColor);
 				String sPsize = String.join(",", linkedHashSetSize);
-				
-				// System.out.println("문자열로 변환한 색상 ===> " + sPcolor);
-				// System.out.println("문자열로 변환한 사이즈 ===> " + sPsize);
-				
-				/* 
-				for( String color : pdinfoColor ) {
-					System.out.println("색상은 ???" + color);
-				}
-				for( String size : pdinfoSize ) {
-					System.out.println("사이즈 ???" + size);
-				}
-				*/
 				
 				request.setAttribute("sPcolor", sPcolor);
 				request.setAttribute("sPsize", sPsize);
@@ -172,23 +144,6 @@ public class ProductUpdateAction extends AbstractController {
 				String pcolores = mtrequest.getParameter("pcolor").trim().replace(" ", "");
 				String psizees = mtrequest.getParameter("psize").trim().replace(" ", "");
 				
-				// 첨부파일은 변경 안하는걸로...
-								
-				System.out.println("상품번호 ==> " + pdno);
-				System.out.println("카테고리 ==> " + pdcategory_fk);
-				System.out.println("상품명 ==> " + pdname);
-				System.out.println("pdimage1 ==> " + pdimage1);
-				System.out.println("pdimage2 ==> " + pdimage2);
-				System.out.println("재고량 ==> " + pdqty);
-				System.out.println("가격 ==> " + price);
-				System.out.println("할인가 ==> " + saleprice);
-				System.out.println("내용 ==> " + pdcontent);
-				System.out.println("소재 ==> " + texture);
-				System.out.println("성별 ==> " + pdgender);
-				System.out.println("추가 이미지 파일==> " + imgfilename);				
-				System.out.println("색상 ==> " + pcolores);
-				System.out.println("사이즈 ==> " + psizees);
-				
 				ProductVO pvo = new ProductVO();
 				
 				
@@ -222,27 +177,15 @@ public class ProductUpdateAction extends AbstractController {
 				
 				pcolor = pcolores.split(",");
 				psize = psizees.split(",");
-				
-				for(int i=0; i<pcolor.length; i++) {
-					System.out.println("배열 색상 ==> " + pcolor[i]);
-				}
-				
+								
 				// 색상 배열을 리스트로 변환
 				List<String> pcolorList = new ArrayList<>();
 				Collections.addAll(pcolorList, pcolor);
 				
-				for( String clist : pcolorList ) {
-					System.out.println("색상 리스트 출력 ==> " + clist);
-				}
 		
 				// 사이즈 배열을 리스트로 변환
 				List<String> psizeList = new ArrayList<>();
 				Collections.addAll(psizeList, psize);
-				
-				for(String slist : psizeList) {
-					
-					System.out.println("사이즈 리스트 출력 ==> " + slist);
-				}
 						
 				// 리스트를 문자열로 다시 변환
 				String sPcolor = String.join(",", pcolorList);
@@ -254,13 +197,7 @@ public class ProductUpdateAction extends AbstractController {
 				
 				
 				int prodInfo = 0;
-				
-				for(int i=0; i<pcolorList.size(); i++) {
-					// 색상, 사이즈 업데이트 메소드(update)
-					// prodInfo = pdao.productInfoUpdate(pdno, pcolorList.get(i), nsizeList.get(i));
-				}
-				
-				
+								
 				HashMap<String, String> pdinfono = pdao.pdinfoseqSelect(pdno);
 					
 				String color = "";
@@ -280,8 +217,6 @@ public class ProductUpdateAction extends AbstractController {
 						
 						prodInfo = pdao.productInfoUpdate(pinfonum, color, size);
 						
-						System.out.println("color ====> " + color);
-						System.out.println("size ====> " + size);
 					}
 				}
 				
