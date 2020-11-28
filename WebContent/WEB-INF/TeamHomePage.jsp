@@ -231,28 +231,47 @@ String ctxPath = request.getContextPath();
 </div>
 
 <br> 
- 
-<div id = "Order">
+
+ <%-- 정렬 --%>
+ <div id = "Order">
 	<div class="col-md-3" id="OrderList" style="margin-left: 1100px;">
 		<ul>
-
-			<li value= "sortNewProduct" class = "sort" id = "sortNewProduct">
-				 <a href = "javascript:void(0);"> 신상품 </a> <span class="delimiter">&#124;</span>			
+			<li value= "sortNewProduct" class="sort" id = "sortNewProduct">
+				<c:if test="${sessionScope.sort eq 'sortNewProduct'}">
+					<a style="font-weight: bold;" href = "javascript:void(0);"> 신상품 </a> <span class="delimiter">&#124;</span>			
+				</c:if>
+				<c:if test="${sessionScope.sort ne 'sortNewProduct'}">
+					<a href = "javascript:void(0);"> 신상품 </a> <span class="delimiter">&#124;</span>			
+				</c:if>				
 			</li>
-			<li value= "sortLowPrice" class = "sort" id = "sortLowPrice">
-					<a href = "javascript:void(0);"> 낮은가격 </a> <span class="delimiter">&#124;</span>		
-	
+			<li value= "sortLowPrice" class="sort" id = "sortLowPrice">
+				<c:if test="${sessionScope.sort eq 'sortLowPrice'}">
+					<a style="font-weight: bold;" href = "javascript:void(0);"> 낮은가격 </a> <span class="delimiter">&#124;</span>			
+				</c:if>
+				<c:if test="${sessionScope.sort ne 'sortLowPrice'}">
+					<a href = "javascript:void(0);"> 낮은가격 </a> <span class="delimiter">&#124;</span>			
+				</c:if>					
 			</li>
-			<li value = "sortHighPrice" class = "sort" id= "sortHighPrice">
-				<a href = "javascript:void(0);"> 높은가격 </a> <span class="delimiter">&#124;</span>		
+			<li value = "sortHighPrice" class="sort" id= "sortHighPrice">
+				<c:if test="${sessionScope.sort eq 'sortHighPrice'}">
+					<a style="font-weight: bold;" href = "javascript:void(0);"> 높은가격 </a> <span class="delimiter">&#124;</span>			
+				</c:if>
+				<c:if test="${sessionScope.sort ne 'sortHighPrice'}">
+					<a href = "javascript:void(0);"> 높은가격 </a> <span class="delimiter">&#124;</span>			
+				</c:if>						
 			</li>			
-			<li value = "sortBestProduct" class = "sort" id ="sortBestProduct">
-				<!-- <a href = "<%= ctxPath %>/product/productBestList.neige?gender=${sessionScope.gender}"> 인기상품 </a>  -->	
-				<a href = "javascript:void(0);"> 인기상품 </a>				
-			</li>						
+			<li value = "sortBestProduct" class="sort" id ="sortBestProduct">
+				<c:if test="${sessionScope.sort eq 'sortBestProduct'}">
+					<a style="font-weight: bold;" href = "javascript:void(0);"> 인기상품 </a> 
+				</c:if>
+				<c:if test="${sessionScope.sort ne 'sortBestProduct'}">
+					<a href = "javascript:void(0);"> 인기상품 </a>	
+				</c:if>	
+			</li>	
+								
 		</ul>
 	</div>	
-</div> 
+</div>
  
 <br><br>
 
@@ -288,10 +307,7 @@ String ctxPath = request.getContextPath();
                                 <c:if test="${productMainImageVo.price ne productMainImageVo.saleprice}">
                                 	<span class="badge badge-pill badge-warning" style="font-size: 8pt; background-color:lightcoral">SALE</span>
                                 </c:if>									
-						</li>						
-						<li>
-							<span class="pdNo">${productMainImageVo.pdno}</span>
-						</li> 
+						</li>
 					</ul>
 				</div>
 			</div>
