@@ -154,7 +154,11 @@
 		}
 		else if(cate == "5") {
 			 $("li.5").css('background-color','#8A6C4F');
-		}	 
+		}
+		else {
+			 $("li.0").css('background-color','#8A6C4F');
+		}
+		 
 		 
 		 
 		
@@ -235,26 +239,6 @@
 <br>
 
 <%-- 정렬 : 판매순, 가격순, 신상품  --%>
-<%-- 
-<div id = "Order">
-	<div class="col-md-3" id="OrderList" style="margin-left: 1100px;">
-		<ul>
-			<li>
-				<a href = "<%= ctxPath %>/product/newProductList.neige"> 신상품 </a> <span class="delimiter">&#124;</span>			
-			</li>
-			<li>
-				<a href = "<%= ctxPath %>/product/lowPricewProductList.neige"> 낮은가격 </a> <span class="delimiter">&#124;</span>		
-			</li>
-			<li>
-				<a href = "<%= ctxPath %>/product/highPriceProductList.neige"> 높은가격 </a> <span class="delimiter">&#124;</span>		
-			</li>			
-			<li>
-				<a href = "<%= ctxPath %>/product/productBestList.neige"> 인기상품 </a>					
-			</li>						
-		</ul>
-	</div>	
-</div>
- --%>
  
  <div id = "Order">
 	<div class="col-md-3" id="OrderList" style="margin-left: 1100px;">
@@ -284,7 +268,12 @@
 				</c:if>						
 			</li>			
 			<li value = "sortBestProduct" class="sort" id ="sortBestProduct">
-				<a href = "<%= ctxPath %>/product/productBestList.neige?gender=${sessionScope.gender}"> 인기상품 </a>					
+				<c:if test="${sessionScope.sort eq 'sortBestProduct'}">
+					<a style="font-weight: bold;" href = "javascript:void(0);"> 인기상품 </a> 
+				</c:if>
+				<c:if test="${sessionScope.sort ne 'sortBestProduct'}">
+					<a href = "javascript:void(0);"> 인기상품 </a>	
+				</c:if>										
 			</li>						
 		</ul>
 	</div>	
