@@ -84,89 +84,132 @@ public class ProductDAO implements InterProductDAO {
 	      return imageCarouselList;
 	   }
 
-	   // 메인페이지에 보여지는 상품 이미지 tbl_product 에서 조회해오는 메소드 (JIEUN)
-	   @Override
-	   // public List<ProductVO> ProductMainImageSelectAll(String sortType) throws
-	   // SQLException {
-	   public List<ProductVO> ProductMainImageSelectAll(Map<String, String> paraMap) throws SQLException {
+	// 메인페이지에 보여지는 상품 이미지 tbl_product 에서 조회해오는 메소드 (JIEUN)
+	@Override
+	
+	public List<ProductVO> ProductMainImageSelectAll(Map<String, String> paraMap) throws SQLException {
 
-	      List<ProductVO> productMainImageList = new ArrayList<ProductVO>();
+		List<ProductVO> productMainImageList = new ArrayList<ProductVO>();
 
-	      try {
+		try {
 
-	         conn = ds.getConnection();         
-	         
-	         String sql = " select  pdno, pdname, pdcategory_fk, pdimage1, price, saleprice "
-	                   + " from tbl_product ";
-	         
-	         if("sortHighPrice".equals(paraMap.get("sortType"))) {
-	            // 값이 있는데 그 값이 sortHighPrice라면 (높은 가격)
-	            
-	            System.out.println("성별?????" + paraMap.get("gender"));
-	            System.out.println("정렬타입?????" + paraMap.get("sortType"));
+			conn = ds.getConnection();			
+			
+			String sql = " select  pdno, pdname, pdcategory_fk, pdimage1, price, saleprice ";
+				 	   //+ " from tbl_product ";
+			
+			
+			if("sortHighPrice".equals(paraMap.get("sortType"))) {
+				// 값이 있는데 그 값이 sortHighPrice라면 (높은 가격)
+				
+				System.out.println("성별?????" + paraMap.get("gender"));
+				System.out.println("정렬타입?????" + paraMap.get("sortType"));
+				
+				/*
+				sql += " where pdgender = ? " 
+					 + " ORDER BY saleprice desc ";				
+				*/
+				
+				sql += " from tbl_product " 
+					 + " where pdgender = ? " 
+					 + " ORDER BY saleprice desc ";
+				
+			}
+			else if ("sortLowPrice".equals(paraMap.get("sortType"))) {
+				// 값이 있는데 그 값이 sortLowPrice라면 (낮은 가격)
+				
+				/*
+				sql += " where pdgender = ? " 
+				     + " ORDER BY saleprice asc ";
+				*/
+				sql += " from tbl_product " 
+						 + " where pdgender = ? " 
+						 + " ORDER BY saleprice asc ";				
+				
+			} 
+			else if ("sortNewProduct".equals(paraMap.get("sortType"))) {
+				// 값이 있는데 그 값이 sortNewProduct라면 (신상품 조회)
 
-	            sql += " where pdgender = ? " 
-	                + " ORDER BY saleprice desc ";
-	            
-	         }
-	         else if ("sortLowPrice".equals(paraMap.get("sortType"))) {
-	            // 값이 있는데 그 값이 sortLowPrice라면 (낮은 가격)
+				// sql += " where pdgender = ? and pdinputdate >= (sysdate - 31)";
+				
+				sql += " from tbl_product "
+					+ " where pdgender = ? and pdinputdate >= (sysdate - 31)";
+				
+			} 
+			
+			else if("sortBestProduct".equals(paraMap.get("sortType"))) {
+				// 값이 있는데 그 값이 sortBestProduct라면 (인기상품 조회)
+				
+				sql += " , nvl(ordersum,0) as ordersum "
+					 + " from tbl_product " 
+					 + " left join " 
+					 + " ( " 
+					 + "	select pdno_fk, ordersum " 
+					 + "    from view_ordercodedetail " 
+					 + " )N " 
+					 + " on pdno = N.pdno_fk "
+					 + " where pdgender = ? "
+					 + " order by ordersum desc ";
+			}
+			
+			else {
+				// 정렬이 null
+				
+				System.out.println("전체 상품 조회~~ 성별은 ?? ==> " + paraMap.get("gender"));
+				
+				sql += " from tbl_product "
+					 + " where pdgender = ? ";
+			}
 
-	            sql += " where pdgender = ? " 
-	                 + " ORDER BY saleprice asc ";
-	         } 
-	         else if ("sortNewProduct".equals(paraMap.get("sortType"))) {
-	            // 값이 있는데 그 값이 sortNewProduct라면 (신상품 조회)
+			pstmt = conn.prepareStatement(sql);
+			
+			if("sortHighPrice".equals(paraMap.get("sortType"))) {
+				// 값이 있는데 그 값이 sortHighPrice라면 (높은 가격)
+				pstmt.setNString(1, paraMap.get("gender"));			
+			}
+			else if ("sortLowPrice".equals(paraMap.get("sortType"))) {
+				// 값이 있는데 그 값이 sortLowPrice라면 (낮은 가격)
+				pstmt.setNString(1, paraMap.get("gender"));	
+			} 
+			else if ("sortNewProduct".equals(paraMap.get("sortType"))) {
+				// 값이 있는데 그 값이 sortNewProduct라면 (신상품 조회)
+				pstmt.setNString(1, paraMap.get("gender"));					
+			} 
+			
+			else if("sortBestProduct".equals(paraMap.get("sortType"))) {
+				// 값이 있는데 그 값이 sortBestProduct라면 (인기상품 조회)
+				
+				pstmt.setString(1, paraMap.get("gender"));		
+			}
+			
+			else {
+				pstmt.setNString(1, paraMap.get("gender"));	
+			}			
 
-	            sql += " where pdgender = ? and pdinputdate >= (sysdate - 31)";
-	            
-	         } 
-	         else {
-	            
-	            sql += " where pdgender = ? ";
-	         }
+			rs = pstmt.executeQuery();
 
-	         pstmt = conn.prepareStatement(sql);
-	         
-	         if("sortHighPrice".equals(paraMap.get("sortType"))) {
-	            // 값이 있는데 그 값이 sortHighPrice라면 (높은 가격)
-	            pstmt.setNString(1, paraMap.get("gender"));         
-	         }
-	         else if ("sortLowPrice".equals(paraMap.get("sortType"))) {
-	            // 값이 있는데 그 값이 sortLowPrice라면 (낮은 가격)
-	            pstmt.setNString(1, paraMap.get("gender"));   
-	         } 
-	         else if ("sortNewProduct".equals(paraMap.get("sortType"))) {
-	            // 값이 있는데 그 값이 sortNewProduct라면 (신상품 조회)
-	            pstmt.setNString(1, paraMap.get("gender"));               
-	         } 
-	         else {
-	            pstmt.setNString(1, paraMap.get("gender"));   
-	         }         
+			while (rs.next()) {
 
-	         rs = pstmt.executeQuery();
+				ProductVO pdvo = new ProductVO();
 
-	         while (rs.next()) {
+				pdvo.setPdno(rs.getInt(1));
+				pdvo.setPdname(rs.getString(2));
+				pdvo.setPdcategory_fk(rs.getString(3));
+				pdvo.setPdimage1(rs.getString(4));
+				pdvo.setPrice(rs.getInt(5));
+				pdvo.setSaleprice(rs.getInt(6));
+				
+				productMainImageList.add(pdvo);
 
-	            ProductVO pdvo = new ProductVO();
+			}
 
-	            pdvo.setPdno(rs.getInt(1));
-	            pdvo.setPdname(rs.getString(2));
-	            pdvo.setPdcategory_fk(rs.getString(3));
-	            pdvo.setPdimage1(rs.getString(4));
-	            pdvo.setPrice(rs.getInt(5));
-	            pdvo.setSaleprice(rs.getInt(6));
+		} finally {
+			close();
+		}
 
-	            productMainImageList.add(pdvo);
+		return productMainImageList;
+	}
 
-	         }
-
-	      } finally {
-	         close();
-	      }
-
-	      return productMainImageList;
-	   }
 
 	   // 메인페이지에서 보여지는 상품 색상 tbl_product_info에서 조회해오는 메소드(JIEUN)
 	   @Override
