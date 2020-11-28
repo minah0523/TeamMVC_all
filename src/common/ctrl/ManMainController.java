@@ -27,8 +27,9 @@ public class ManMainController extends AbstractController {
 		// 위에서 받아온 gender를 세션에 저장한다. (ManMain.jsp에서 세션을 불러서 url에 전송하기 위해 세션에 담는다. 
 		HttpSession session = request.getSession(); 
 		session.setAttribute("gender",gender);
-		
-		System.out.println("session값 : " + session.getAttribute("gender"));
+
+		// 정렬도 session에 저장해서 어떤 값을 클릭했는지 bold로 보여주자
+		session.setAttribute("sort", sortType);
 		
 		InterProductDAO pdao = new ProductDAO();
 		
