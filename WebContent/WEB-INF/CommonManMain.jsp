@@ -126,8 +126,6 @@
 		$("li.sort").click(function(){
 			
 			var sort = $(this).attr('value');
-			alert("남자 test~~~~ " + sort);
-			
 			var gender = ${sessionScope.gender};
 			var pdcategory_fk = ${sessionScope.pdcategory_fk};
 			
@@ -136,7 +134,6 @@
 		
 		// 카테고리 코드 받아서 클릭 했을때 클릭 상태 표시를 위해서 배경색 변경
 		var cate = ${sessionScope.pdcategory_fk};
-		alert("카테고리 => " + cate);
 		 
 		if(cate == "1") {
 			 $("li.1").css('background-color','#666666');
@@ -152,7 +149,10 @@
 		}
 		else if(cate == "5") {
 			 $("li.5").css('background-color','#666666');
-		}	 
+		}
+		else {
+			 $("li.0").css('background-color','#8A6C4F');
+		}	 	 
 		 
 		
 	});
@@ -263,7 +263,12 @@
 				</c:if>						
 			</li>			
 			<li value = "sortBestProduct" class="sort" id ="sortBestProduct">
-				<a href = "<%= ctxPath %>/product/productBestList.neige?gender=${sessionScope.gender}"> 인기상품 </a>					
+				<c:if test="${sessionScope.sort eq 'sortBestProduct'}">
+					<a style="font-weight: bold;" href = "javascript:void(0);"> 인기상품 </a> 
+				</c:if>
+				<c:if test="${sessionScope.sort ne 'sortBestProduct'}">
+					<a href = "javascript:void(0);"> 인기상품 </a>	
+				</c:if>					
 			</li>						
 		</ul>
 	</div>	
