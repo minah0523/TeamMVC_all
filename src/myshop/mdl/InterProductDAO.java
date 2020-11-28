@@ -74,8 +74,10 @@ public interface InterProductDAO {
 	
 	// 색상, 사이즈 일련번호 구해오기 (JIEUN)
 	HashMap<String, String> pdinfoseqSelect(String pdno) throws SQLException;
-	
-	
+		
+	// 관리자 페이지에서 주문 리스트 가져오는(select) 메소드(JIEUN)
+	List<OrderDetailVO> adminOrderListAll() throws SQLException;
+		
 	// search페이지에 보여지는 상품이미지파일명을 모두 조회(select)하는 메소드 (MINA)
 	List<ProductVO> searchProduct(Map<String, String> paraMap) throws SQLException;
 
