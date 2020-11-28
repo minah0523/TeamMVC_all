@@ -366,12 +366,6 @@ function goProductUpdate() {
 	var pcolor = $("input#pcolor").val();
 	var psize = $("input#psize").val();
 	
-	
-	//var frm = document.updateProductFrm;
-	//frm.method = "POST";
-	
-	
-	
 }
 
 function goReset() {
@@ -439,7 +433,7 @@ function goProductDelete() {
 	         	 <span>
 	         	 	<img width="200px" height="200px;" src = "<%= ctxPath %>/images2/${pvo.pdimage1}">	
 	             	<%-- <input type="file" name="pdimage1" id="pdimage1" value="${pvo.pdimage1}"  /> --%>
-	             	<span class="error">제품이미지는 필수입력 사항입니다.</span>
+	             	<%-- <span class="error">제품이미지는 필수입력 사항입니다.</span> --%>
 	             </span>
 	         </td> 
 	      </tr>
@@ -449,7 +443,7 @@ function goProductDelete() {
 	      		<span>
 	      			<img width="200px" height="200px;" src = "<%= ctxPath %>/images2/${pvo.pdimage2}">
 	             	<%-- <input type="file" name="pdimage2" id="pdimage2" value="${pvo.pdimage2}"  /> --%>
-	             	<span class="error">제품이미지는 필수입력 사항입니다.</span>
+	             	<%-- <span class="error">제품이미지는 필수입력 사항입니다.</span> --%>
 	             </span>
 	        </td>	      	
 	      </tr>
