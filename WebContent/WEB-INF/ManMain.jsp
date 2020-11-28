@@ -291,10 +291,7 @@
 						<c:forTokens var="item" items="${productMainImageVo.colores}" delims=",">
                             <span>${item}</span>
                             <span class="dot" style="background-color:${item}"></span>
-						</c:forTokens>
-						<li>
-							<span>상품번호${productMainImageVo.pdno}</span>
-						</li>						
+						</c:forTokens>					
 					</ul>
 				</div>
 			</div>
