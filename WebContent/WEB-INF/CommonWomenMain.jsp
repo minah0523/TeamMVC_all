@@ -126,19 +126,15 @@
 		$("li.sort").click(function(){
 			
 			var sort = $(this).attr('value');
-			// alert("여자 test~~~~ " + sort);
-			
 			var gender = ${sessionScope.gender};
 			var pdcategory_fk = ${sessionScope.pdcategory_fk};
 			
 			location.href="<%= ctxPath%>/category/categorySelectList.neige?pdcategory_fk="+pdcategory_fk+"&sort="+sort+"&gender="+gender;			
 			
-			// $("li.sort").children('a').css('font-weight','bold');		
 		});	
 	    
 		// 카테고리 코드 받아서 클릭 했을때 클릭 상태 표시를 위해서 배경색 변경
 		var cate = ${sessionScope.pdcategory_fk};
-		alert("카테고리 => " + cate);
 		 
 		if(cate == "1") {
 			 $("li.1").css('background-color','#8A6C4F');
