@@ -8,7 +8,6 @@
 <jsp:include page="../header.jsp" />
     
 <style type="text/css">
-
 	div#mvoInfo {
 		width: 60%; 
 		text-align: left;
@@ -30,7 +29,6 @@
 	border: hidden;
 	margin: 10px;
 	}
-
 	 
 	 
 	 
@@ -45,6 +43,16 @@ table#tblMemberEdit td {
 	float:left;
 	font-family: Times New Roman;
 	
+}
+button.btnGoBack {
+    	width: 100px;
+    	margin-right: 20px;
+    	border-radius: 2px;
+    	background-color: #BCA897;
+    	border: hidden;
+    	height: 30px;
+    	color: white;
+    	font-weight: bold;	
 }
 /* ============================================= */
 	/*div#sms {
@@ -82,13 +90,11 @@ table#tblMemberEdit td {
 		padding: 20px;
 	}	
 	*/
-
 </style>    
 
 <script type="text/javascript">
     
     var goBackURL = "";
-
 	$(document).ready(function(){
 		
 		$("div#smsResult").hide();
@@ -151,13 +157,13 @@ table#tblMemberEdit td {
 	<c:set var="mobile" value="${mvo.mobile}" />
 	<c:set var="birthday" value="${mvo.birthday}" />
 	
-	<div id="mvoInfo">
+	<div id="mvoInfo" style="margin-left: -150px;">
 	<h4>::: <span style="color:orange">${mvo.name}</span>>님의 회원 상세정보 :::</h4>
 	<br/>
-		<table id="tblMemberEdit" style="font-size: 10px; color: gray;">
+	<table id="tblMemberEdit" style="font-size: 10px; color: gray;">
 	<tr>
-		<td style="width: 20%; font-weight: bold;">아이디</td>
-		<td style="width: 80%; text-align: left;">${mvo.userid}</td>
+		<td style="width: 100px; font-weight: bold;">아이디</td>
+		<td style="width: 400px; text-align: left;">${mvo.userid}</td>
 	</tr>
 	<tr>
 		<td style="width: 20%; font-weight: bold;">이메일</td>
@@ -223,13 +229,8 @@ table#tblMemberEdit td {
 <div>
 	<!-- <button style="margin-top: 50px;" type="button" onclick="javascript:history.back();">돌아가기</button> -->
 	&nbsp;&nbsp;
-	<button style="margin-top: 50px;" type="button" onclick="goMemberList()">돌아가기</button>
+	<button class="btnGoBack" style="margin-left:-160px;  margin-top: 50px;" type="button" onclick="goMemberList()">돌아가기</button>
 </div>
 
     
 <jsp:include page="../footer.jsp" />   
-
-
-
-
- 
