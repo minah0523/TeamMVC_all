@@ -1,10 +1,15 @@
 package member.ctrl;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import Payment.mdl.OrderDetailVO;
+import Payment.mdl.OrderVO;
 import common.ctrl.AbstractController;
+import member.mdl.MemberDAO;
 import member.mdl.MemberVO;
 
 public class MyPageAction extends AbstractController {
@@ -16,11 +21,18 @@ public class MyPageAction extends AbstractController {
 		
 		MemberVO loginuser = (MemberVO) session.getAttribute("loginuser");
 	
+	
 		//마이페이지에 들어오기 위한 전제조건은 먼저 로그인을 해야 하는 것이다. 
 		if( loginuser != null ) {
 			// 로그인을 했으면
 			
+			MemberDAO mdao = new MemberDAO();
+			String userid = loginuser.getUserid();
+			List<OrderDetailVO> orderList = mdao.selectOrderList(userid);
 		//	super.setRedirect(false);
+
+			
+			request.setAttribute("orderList", orderList);
 			super.setViewPage("/WEB-INF/member/myPage.jsp");
 		}
 		else {
@@ -36,4 +48,6 @@ public class MyPageAction extends AbstractController {
 		}	
 		
 	}
+
+
 }
