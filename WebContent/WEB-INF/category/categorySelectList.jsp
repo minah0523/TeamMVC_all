@@ -63,10 +63,7 @@
                   <c:forTokens var="item" items="${categoryProducClickListVo.colores}" delims=",">
                             <span>${item}</span>
                             <span class="dot" style="background-color:${item}"></span>
-                  </c:forTokens>
-                  <li>
-                     <span>상품번호${categoryProducClickListVo.pdno}</span>
-                  </li>                  
+                  </c:forTokens>                 
                </ul>
             </div>
          </div>
