@@ -15,19 +15,25 @@ public class LikeCntAction extends AbstractController {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		String pnum = request.getParameter("pnum");
+		String pdno = "";
+		pdno = request.getParameter("pdno");
 		
 		InterProductDAO pdao = new ProductDAO();
 		
-		Map<String, Integer> map = pdao.getLikeCnt(pnum);
+		System.out.println("Likecntact pdno1 : " + pdno);
+		Map<String, Integer> map = pdao.getLikeCnt(pdno);
+		System.out.println("Likecntact map: " + map);
 		
 		JSONObject jsonObj = new JSONObject();
 		
 		jsonObj.put("likecnt", map.get("likecnt"));			// {"likecnt":1}
+		System.out.println("Likecntact jsonObj : " + jsonObj);
 		
 		String json = jsonObj.toString();	// {"likecnt":1,"dislikecnt":0}
 		
 		request.setAttribute("json", json);
+		System.out.println("Likecntact json : " + json);
+		System.out.println("Likecntact pdno3 : " + pdno);
 		
 		//super.setRedirect(false);
 		super.setViewPage("/WEB-INF/jsonview.jsp");
@@ -37,3 +43,4 @@ public class LikeCntAction extends AbstractController {
 	}
 
 }
+ 
