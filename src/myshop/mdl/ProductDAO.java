@@ -2733,304 +2733,350 @@ public class ProductDAO implements InterProductDAO {
 		
 		// 홍승의//
 
-		//물품 상세정보 pdno key 값의 정보를 불러온다. (승의)
-			@Override
-			public List<ProductVO> ProductList(String pdno) throws SQLException {
+	// 물품 상세정보 pdno key 값의 정보를 불러온다. (승의)
+	@Override
+	public List<ProductVO> ProductList(String pdno) throws SQLException {
 
-				List<ProductVO> productList = new ArrayList<>();
+		List<ProductVO> productList = new ArrayList<>();
 
-				try {
-					conn = ds.getConnection();
+		try {
+			conn = ds.getConnection();
 
-					String sql = "SELECT PDNO, PDNAME, PDCATEGORY_FK, PDIMAGE1, PDIMAGE2, PDQTY, PRICE, SALEPRICE, PDCONTENT, POINT, TEXTURE   "
-							+ "FROM TBL_PRODUCT  " + "WHERE PDNO = ? ";
+			String sql = "SELECT PDNO, PDNAME, PDCATEGORY_FK, PDIMAGE1, PDIMAGE2, PDQTY, PRICE, SALEPRICE, PDCONTENT, POINT, TEXTURE   "
+					+ "FROM TBL_PRODUCT  " + "WHERE PDNO = ? ";
 
-					pstmt = conn.prepareStatement(sql);
-					pstmt.setString(1, pdno);
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, pdno);
 
-					rs = pstmt.executeQuery();
+			rs = pstmt.executeQuery();
 
-					while (rs.next()) {
+			while (rs.next()) {
 
-						ProductVO pdvo = new ProductVO();
+				ProductVO pdvo = new ProductVO();
 
-						pdvo.setPdno(rs.getInt(1));
-						pdvo.setPdname(rs.getString(2));
-						pdvo.setPdcategory_fk(rs.getString(3));
-						pdvo.setPdimage1(rs.getString(4));
-						pdvo.setPdimage2(rs.getString(5));
+				pdvo.setPdno(rs.getInt(1));
+				pdvo.setPdname(rs.getString(2));
+				pdvo.setPdcategory_fk(rs.getString(3));
+				pdvo.setPdimage1(rs.getString(4));
+				pdvo.setPdimage2(rs.getString(5));
 
-						pdvo.setPdqty(rs.getInt(6));
-						pdvo.setPrice(rs.getInt(7));
-						pdvo.setSaleprice(rs.getInt(8));
-						pdvo.setPdcontent(rs.getString(9));
-						pdvo.setPoint(rs.getInt(10));
+				pdvo.setPdqty(rs.getInt(6));
+				pdvo.setPrice(rs.getInt(7));
+				pdvo.setSaleprice(rs.getInt(8));
+				pdvo.setPdcontent(rs.getString(9));
+				pdvo.setPoint(rs.getInt(10));
 
-						pdvo.setTexture(rs.getString(11));
+				pdvo.setTexture(rs.getString(11));
 
-						productList.add(pdvo);
+				productList.add(pdvo);
 
-					} // end of while------------------------------------
+			} // end of while------------------------------------
 
-				} finally {
-					close();
-				}
+		} finally {
+			close();
+		}
 
-				return productList;
+		return productList;
 
+	}
+
+	// 물품상세페이지에서의 사이즈,색상 (승의)
+	@Override
+	public List<ProductInfoVO> ProductInfoList(String pdno) throws SQLException {
+
+		List<ProductInfoVO> productinfoList = new ArrayList<>();
+
+		try {
+			conn = ds.getConnection();
+
+			String sql = "SELECT PINFONO, PDNO_FK, PCOLOR, PSIZE " + "FROM TBL_PRODUCT_INFO " + "WHERE PDNO_FK = ? "
+					+ "ORDER BY PINFONO ASC";
+
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, pdno);
+
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+
+				ProductInfoVO pdinfovo = new ProductInfoVO();
+
+				pdinfovo.setPinfono(rs.getInt(1));
+				pdinfovo.setPdno_fk(rs.getInt(2));
+				pdinfovo.setPcolor(rs.getString(3));
+				pdinfovo.setPsize(rs.getString(4));
+
+				productinfoList.add(pdinfovo);
+				// System.out.println("DAO-Checked INFOVO : " + pdinfovo);
+			} // end of while------------------------------------
+
+		} finally {
+			close();
+		}
+
+		return productinfoList;
+
+	}
+
+	// 특정 회원이 특정 제품에 대해 좋아요에 투표하기(insert)
+	@Override
+	public int like(Map<String, String> paraMap) throws SQLException {
+
+		int n = 0;
+
+		try {
+			conn = ds.getConnection();
+
+			conn.setAutoCommit(false); // 수동커밋으로 전환
+
+			String sql = " insert into tbl_product_like(fk_userid, fk_pdno) " + " values('admin', ?) ";
+
+			pstmt = conn.prepareStatement(sql);
+			// pstmt.setString(1, paraMap.get("userid"));
+			pstmt.setString(1, paraMap.get("pdno"));
+
+			pstmt.executeUpdate();
+
+			if (n == 1) {
+				conn.commit();
 			}
 
-		//물품상세페이지에서의 사이즈,색상 (승의)
-			@Override
-			public List<ProductInfoVO> ProductInfoList(String pdno) throws SQLException {
+		} catch (SQLIntegrityConstraintViolationException e) {
+			conn.rollback();
+		} finally {
+			close();
+		}
 
-				List<ProductInfoVO> productinfoList = new ArrayList<>();
+		return n;
+	}
 
-				try {
-					conn = ds.getConnection();
+	// 특정 제품에 대한 좋아요수 (select)
+	@Override
+	public Map<String, Integer> getLikeCnt(String pdno) throws SQLException {
 
-					String sql = "SELECT PINFONO, PDNO_FK, PCOLOR, PSIZE " + "FROM TBL_PRODUCT_INFO " + "WHERE PDNO_FK = ? "
-							+ "ORDER BY PINFONO ASC";
+		Map<String, Integer> map = new HashMap<>();
 
-					pstmt = conn.prepareStatement(sql);
-					pstmt.setString(1, pdno);
+		try {
+			conn = ds.getConnection();
 
-					rs = pstmt.executeQuery();
+			String sql = " select count(*) "
+					+ " from tbl_product_like "
+					+ "	 where fk_pdno = ? ";
 
-					while (rs.next()) {
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, pdno);
 
-						ProductInfoVO pdinfovo = new ProductInfoVO();
+			rs = pstmt.executeQuery();
 
-						pdinfovo.setPinfono(rs.getInt(1));
-						pdinfovo.setPdno_fk(rs.getInt(2));
-						pdinfovo.setPcolor(rs.getString(3));
-						pdinfovo.setPsize(rs.getString(4));
+			rs.next();
 
-						productinfoList.add(pdinfovo);
-						System.out.println("DAO-Checked INFOVO : " + pdinfovo);
-					} // end of while------------------------------------
+			map.put("likecnt", rs.getInt(1));
 
-				} finally {
-					close();
-				}
+		} finally {
+			close();
+		}
 
-				return productinfoList;
+		return map;
 
-			}
+	}
 
-		//특정 회원이 특정 제품에 대해 좋아요에 투표하기(insert) 
-			@Override
-			public int like(Map<String, String> paraMap) throws SQLException {
-
-				int n = 0;
-
-				try {
-					conn = ds.getConnection();
-
-					conn.setAutoCommit(false); // 수동커밋으로 전환
-
-					String sql = " insert into tbl_product_like(fk_userid, fk_pdno) " + " values(?, ?) ";
-
-					pstmt = conn.prepareStatement(sql);
-					pstmt.setString(1, paraMap.get("userid"));
-					pstmt.setString(2, paraMap.get("pdno"));
-
-					pstmt.executeUpdate();
-
-					if (n == 1) {
-						conn.commit();
-					}
-
-				} catch (SQLIntegrityConstraintViolationException e) {
-					conn.rollback();
-				} finally {
-					close();
-				}
-
-				return n;
-			}
-
-		//특정 제품에 대한 좋아요수 (select)
-			@Override
-			public Map<String, Integer> getLikeCnt(String pdno) throws SQLException {
-
-				Map<String, Integer> map = new HashMap<>();
-
-				try {
-					conn = ds.getConnection();
-
-					String sql = " select count(*) " + " from tbl_product_like " + " where pdno = ? " + " from dual ";
-
-					pstmt = conn.prepareStatement(sql);
-					pstmt.setString(1, pdno);
-
-					rs = pstmt.executeQuery();
-
-					rs.next();
-
-					map.put("likecnt", rs.getInt(1));
-
-				} finally {
-					close();
-				}
-
-				return map;
-
-			}
-
-			@Override
-			public int addCart(Map<String, String> paraMap) throws SQLException {
+	@Override
+	public int addCart(Map<String, String> paraMap) throws SQLException {
 		// TODO Auto-generated method stub
-				return 0;
+		return 0;
+	}
+
+	// Ajax 를 이용한 특정 제품의 상품후기를 입력(insert)하기
+	@Override
+	public int addComment(PurchaseReviewsVO previewvo) throws SQLException {
+
+		int n = 0;
+
+		try {
+			conn = ds.getConnection();
+
+			String sql = " insert into tbl_purchase_reviews(review_seq, fk_userid, fk_pdno, contents, writeDate, starpoint) "
+					+ " values(seq_purchase_reviews.nextval, ?, ?, ?, default, ?) ";
+
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, previewvo.getFk_userid());
+			pstmt.setInt(2, previewvo.getFk_pdno());
+			pstmt.setString(3, previewvo.getContents());
+			pstmt.setString(4, previewvo.getStarpoint());
+
+			n = pstmt.executeUpdate();
+
+		} finally {
+			close();
+		}
+
+		return n;
+	}
+
+	// Ajax 를 이용한 특정 제품의 상품후기를 조회(select)하기
+	@Override
+	public List<PurchaseReviewsVO> commentList(String fk_pdno) throws SQLException {
+
+		List<PurchaseReviewsVO> CommentList = new ArrayList<>();
+
+		try {
+			conn = ds.getConnection();
+
+			String sql = "select review_seq, name, fk_pdno, contents, to_char(writeDate, 'yyyy-mm-dd hh24:mi:ss') AS writeDate, starpoint \n"
+					+ "from tbl_purchase_reviews R join tbl_member M \n" + "on R.fk_userid = M.userid\n"
+					+ "where R.fk_pdno = ? \n" + "order by review_seq desc ";
+
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, fk_pdno);
+
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				String contents = rs.getString("contents");
+				String name = rs.getString("name");
+				String writeDate = rs.getString("writeDate");
+				String starpoint = rs.getString("starpoint");
+
+				PurchaseReviewsVO previewvo = new PurchaseReviewsVO();
+				previewvo.setContents(contents);
+
+				MemberVO mvo = new MemberVO();
+				mvo.setName(name);
+
+				previewvo.setMvo(mvo);
+				previewvo.setWriteDate(writeDate);
+
+				CommentList.add(previewvo);
 			}
 
-		//Ajax 를 이용한 특정 제품의 상품후기를 입력(insert)하기 
-			@Override
-			public int addComment(PurchaseReviewsVO previewvo) throws SQLException {
+		} finally {
+			close();
+		}
 
-				int n = 0;
+		return CommentList;
+	}
 
-				try {
-					conn = ds.getConnection();
+	@Override
+	public String getPinfono(String color, String size, String pdno) throws SQLException {
+		String result = "";
 
-					String sql = " insert into tbl_purchase_reviews(review_seq, fk_userid, fk_pdno, contents, writeDate, starpoint) "
-							+ " values(seq_purchase_reviews.nextval, ?, ?, ?, default, ?) ";
+		try {
+			conn = ds.getConnection(); // DBCP에서 connection 받아오기
 
-					pstmt = conn.prepareStatement(sql);
-					pstmt.setString(1, previewvo.getFk_userid());
-					pstmt.setInt(2, previewvo.getFk_pdno());
-					pstmt.setString(3, previewvo.getContents());
-					pstmt.setString(4, previewvo.getStarpoint());
+			String sql = " select pinfono " + " from TBL_PRODUCT_INFO "
+					+ " where pcolor = ? and pdno_fk = ? and psize = ? ";
 
-					n = pstmt.executeUpdate();
+			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
 
-				} finally {
-					close();
-				}
+			pstmt.setString(1, color);
+			pstmt.setString(2, pdno);
+			pstmt.setString(3, size);
 
-				return n;
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				result = rs.getString(1);
 			}
+		} finally {
+			close();
+		}
 
-		// Ajax 를 이용한 특정 제품의 상품후기를 조회(select)하기
-			@Override
-			public List<PurchaseReviewsVO> commentList(String fk_pdno) throws SQLException {
+		return result;
+	}
 
-				List<PurchaseReviewsVO> CommentList = new ArrayList<>();
+	// 장바구니 값전달
+	@Override
+	public int sendCartList(Map<String, String> cartMap) throws SQLException {
 
-				try {
-					conn = ds.getConnection();
+		int CartList = 0;
+		
+		
+		try {
+			conn = ds.getConnection();
 
-					String sql = "select review_seq, name, fk_pdno, contents, to_char(writeDate, 'yyyy-mm-dd hh24:mi:ss') AS writeDate, starpoint "
-							+ "from tbl_purchase_reviews R join tbl_member M " + "on R.fk_userid = M.userid  "
-							+ "where R.fk_pdno = ? " + "order by review_seq desc";
+			conn.setAutoCommit(false); // 수동커밋으로 전환
 
-					pstmt = conn.prepareStatement(sql);
-					pstmt.setString(1, fk_pdno);
+			String sql = "select pinfono from TBL_PRODUCT_INFO where pcolor = ? and pdno_fk = ? and psize = ? ";
 
-					rs = pstmt.executeQuery();
+			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
 
-					while (rs.next()) {
-						String contents = rs.getString("contents");
-						String name = rs.getString("name");
-						String writeDate = rs.getString("writeDate");
-						String starpoint = rs.getString("starpoint");
+			pstmt.setString(1, cartMap.get("pcolor"));
+			pstmt.setString(2, cartMap.get("pdno_fk"));
+			pstmt.setString(3, cartMap.get("psize"));
 
-						PurchaseReviewsVO previewvo = new PurchaseReviewsVO();
-						previewvo.setContents(contents);
+			rs = pstmt.executeQuery();
+			// ========================================================================================================
 
-						MemberVO mvo = new MemberVO();
-						mvo.setName(name);
-
-						previewvo.setMvo(mvo);
-						previewvo.setWriteDate(writeDate);
-
-						CommentList.add(previewvo);
-					}
-
-				} finally {
-					close();
-				}
-
-				return CommentList;
-			}
-
-			@Override
-			public String getPinfono(String color, String size, String pdno) throws SQLException {
-				String result = "";
-
-				try {
-					conn = ds.getConnection(); // DBCP에서 connection 받아오기
-
-					String sql = " select pinfono " + " from TBL_PRODUCT_INFO "
-							+ " where pcolor = ? and pdno_fk = ? and psize = ? ";
-
-					pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
-
-					pstmt.setString(1, color);
-					pstmt.setString(2, pdno);
-					pstmt.setString(3, size);
-
-					rs = pstmt.executeQuery();
-
-					while (rs.next()) {
-						result = rs.getString(1);
-					}
-				} finally {
-					close();
-				}
-
-				return result;
-			}
-
-		//장바구니 값전달
-			@Override
-			public int sendCartList(Map<String, String> cartMap) throws SQLException {
-
-				int CartList = 0;
-
-				try {
-					conn = ds.getConnection();
-
-					conn.setAutoCommit(false); // 수동커밋으로 전환
-
-					String sql = "select pinfono from TBL_PRODUCT_INFO where pcolor = ? and pdno_fk = ? and psize = ? ";
-
-					pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
-
-					pstmt.setString(1, cartMap.get("pcolor"));
-					pstmt.setString(2, cartMap.get("pdno_fk"));
-					pstmt.setString(3, cartMap.get("psize"));
-
-					rs = pstmt.executeQuery();
-		// ========================================================================================================
-
-		// sql = " insert into tbl_cart(CARTNO,USERID_FK,PINFONO,PQTY,registerday)" 
+			// sql = " insert into tbl_cart(CARTNO,USERID_FK,PINFONO,PQTY,registerday)"
 //				 + " values(SEQ_TBL_CART.nextval, ?, ?, ?, default) ";
 
-					sql = " insert into tbl_cart(CARTNO, USERID_FK, PINFONO, PQTY) values(SEQ_TBL_CART.nextval, ?, ?, ?) ";
+			sql = " insert into tbl_cart(CARTNO, USERID_FK, PINFONO, PQTY) values(SEQ_TBL_CART.nextval, ?, ?, ? ) ";
 
-					pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
+			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
 
-					pstmt.setString(1, cartMap.get("userid_fk"));
-					pstmt.setString(1, cartMap.get("pinfono"));
-					pstmt.setString(2, cartMap.get("pqty"));
+			pstmt.setString(1, cartMap.get("userid_fk"));
+			pstmt.setString(1, cartMap.get("pinfono"));
+			pstmt.setString(2, cartMap.get("pqty"));
 
-					CartList = pstmt.executeUpdate();
+			CartList = pstmt.executeUpdate();
 
-					if (CartList == 1) {
-						conn.commit();
-					}
-
-				} catch (SQLIntegrityConstraintViolationException e) {
-					conn.rollback();
-				} finally {
-					close();
-				}
-
-				return CartList;
+			if (CartList == 1) {
+				conn.commit();
 			}
 
-		/// 승의 끝
+		} catch (SQLIntegrityConstraintViolationException e) {
+			conn.rollback();
+		} finally {
+			close();
+		}
+
+		return CartList;
+	}
+
+	
+	@Override
+	public ProductVO selectOneProductByPdno(String pdno) throws SQLException {
+
+		ProductVO pdvo = new ProductVO();
+
+		try {
+			conn = ds.getConnection();
+
+			String sql = "SELECT PDNO, PDNAME, PDCATEGORY_FK, PDIMAGE1, PDIMAGE2, PDQTY, PRICE, SALEPRICE, PDCONTENT, POINT, TEXTURE   "
+					+ "FROM TBL_PRODUCT  " + "WHERE PDNO = ? ";
+
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, pdvo.getPdno());
+
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+
+				pdvo.setPdno(rs.getInt(1));
+				pdvo.setPdname(rs.getString(2));
+				pdvo.setPdcategory_fk(rs.getString(3));
+				pdvo.setPdimage1(rs.getString(4));
+				pdvo.setPdimage2(rs.getString(5));
+
+				pdvo.setPdqty(rs.getInt(6));
+				pdvo.setPrice(rs.getInt(7));
+				pdvo.setSaleprice(rs.getInt(8));
+				pdvo.setPdcontent(rs.getString(9));
+				pdvo.setPoint(rs.getInt(10));
+
+				pdvo.setTexture(rs.getString(11));
+
+			} // end of if------------------------------------
+
+		} finally {
+			close();
+		}
+		System.out.println(pdvo);
+		return pdvo;
+
+	}
+
+	/// 승의 끝
 
 	///////////////////////////////////////김동휘/////////////////////////////////////
 	
