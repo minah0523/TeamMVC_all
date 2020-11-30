@@ -105,9 +105,8 @@ public interface InterProductDAO {
 		// 특정 회원이 특정 제품에 대해 좋아요에 투표하기(insert)
 		int like(Map<String, String> paraMap) throws SQLException;
 
-		// 특정 제품에 대한 좋아요의 개수결과(select)
+		// 특정 제품에 대한 좋아요,싫어요의 투표결과(select) 
 		Map<String, Integer> getLikeCnt(String pdno) throws SQLException;
-
 		// ------
 		// 현재 페이지의 제품의 pdno를 받아와 장바구니에 insert해준다.
 		int addCart(Map<String, String> paraMap) throws SQLException;
@@ -125,7 +124,11 @@ public interface InterProductDAO {
 		
 		// List<CartVO> sendCartList(String pinfono) throws SQLException;
 		// int sendCartList(CartVO cvo) throws SQLException;
+		//int sendCartList(Map<String, String> cartMap, String userid) throws SQLException;
+		
 		int sendCartList(Map<String, String> cartMap) throws SQLException;
+		
+		ProductVO selectOneProductByPdno(String pdno) throws SQLException;
 		
 		
 		// 승의 끝
