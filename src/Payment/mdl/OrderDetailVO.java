@@ -1,5 +1,8 @@
 package Payment.mdl;
 
+import member.mdl.MemberVO;
+import myshop.mdl.ProductVO;
+
 public class OrderDetailVO {
 	private int odrseqnum;     /* 주문상세일련번호(sequence) */
 	private String fk_odrcode; /* 주문코드 */
@@ -7,7 +10,33 @@ public class OrderDetailVO {
 	private int oqty;		   /* 주문량 */
 	private int odrprice;	   /* 주문가격 */
 	private int deliverstatus; /* 배송상태 */
-	private int deliverdate;   /* 배송완료일자 */
+	private String deliverdate;   /* 배송완료일자 */
+	
+	   ///////////////////////////////////////////
+
+	   private OrderVO ordervo; //주문객체
+	   private ProductVO productvo;//제품객체
+	   private MemberVO membervo;  // 회원객체
+
+	   public OrderVO getOrdervo() {
+	      return ordervo;
+	   }
+	   public void setOrdervo(OrderVO ordervo) {
+	      this.ordervo = ordervo;
+	   }
+	   public ProductVO getProductvo() {
+	      return productvo;
+	   }
+	   public void setProductvo(ProductVO productvo) {
+	      this.productvo = productvo;
+	   }
+	   public MemberVO getMembervo() {
+		   return membervo;
+	   }
+	   public void setMembervo(MemberVO membervo) {
+		   this.membervo = membervo;
+	   }
+	///////////////////////////////////////////
 	
 	public int getOdrseqnum() {
 		return odrseqnum;
@@ -45,10 +74,10 @@ public class OrderDetailVO {
 	public void setDeliverstatus(int deliverstatus) {
 		this.deliverstatus = deliverstatus;
 	}
-	public int getDeliverdate() {
+	public String getDeliverdate() {
 		return deliverdate;
 	}
-	public void setDeliverdate(int deliverdate) {
+	public void setDeliverdate(String deliverdate) {
 		this.deliverdate = deliverdate;
 	}
 	
