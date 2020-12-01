@@ -305,13 +305,19 @@
 	function goBtnClear() {
 		
 		// 라디오
-		$("input:radio[name='gender']").removeAttr('checked');
-		$("input:radio[name='gender']")[0].checked = true; // 첫번째 속성 무조건  true
+		
+		$("input:radio[name='pdgender']").removeAttr('checked');
+		$("input:radio[name='pdgender']")[0].checked = true; // 첫번째 속성 무조건  true
+		
 		
 		$('input').val("");
 		
-		// select태그의 자식중 option태그의 첫번째를 찾아서 selected 속성 부여해준다. 
-		$("select").find('option:first').attr('selected', 'selected');
+		$("li#productRegisterDay").find('button').not($("button#btnDefault")).css({"font-weight":"lighter", "background-color":"#BCA897"});
+		$("button#btnDefault").css({"font-weight":"bold", "background-color":"#8A6C4F"});
+		$("li#productRegisterDay").find('button').not($("button#btnDefault")).css({"font-weight":"lighter", "background-color":"#BCA897"});
+		
+		$("select#sizePerPage").val("10").prop("selected", true);
+		
 	}
 	
 
@@ -369,8 +375,16 @@
 				</li>
 				<li style="margin-left: 1000px;" class = "searchlist">
 					<select id="sizePerPage" name="sizePerPage">
-						<option value="10">10</option>
-						<option value="5">5</option>
+						<c:if test="${sizePerPage == 10}">
+							<option value="10" selected="selected">10</option>
+							<option value="5">5</option>
+						</c:if>
+						
+						<c:if test="${sizePerPage == 5}">
+							<option value="10" >10</option>
+							<option value="5" selected="selected">5</option>
+						</c:if>				
+						
 					</select>
 				</li>
 			</ul>
