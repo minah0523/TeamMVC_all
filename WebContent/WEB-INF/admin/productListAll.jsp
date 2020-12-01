@@ -309,6 +309,7 @@
 		$("input:radio[name='pdgender']").removeAttr('checked');
 		$("input:radio[name='pdgender']")[0].checked = true; // 첫번째 속성 무조건  true
 		
+		$("select#searchType").val("0").prop("selected", true);
 		
 		$('input').val("");
 		
