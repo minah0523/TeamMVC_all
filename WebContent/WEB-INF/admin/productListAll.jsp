@@ -395,6 +395,7 @@
   	
   	<div id = "prodLists">
 		<table id = "prodListTable" class="table " style="text-align: center; border: solid 0px white;"> <%-- table-striped --%>
+			<c:if test="${not empty adminprodList}">
 			<thead id = "tableHead">
 				<tr>
 					<!--  
@@ -433,6 +434,7 @@
 					</tr>
 				</c:forEach> 
 				--%>
+				
 				<c:forEach var="adminProdvo" items="${adminprodList}" varStatus="status">
 					<tr class="productInfo" style="cursor:pointer" >
 						<!-- 
@@ -454,7 +456,27 @@
 							<td class="pdInfoList" style = "border-right: hidden;">여자</td>
 						</c:if> 
 					</tr>
-				</c:forEach> 				
+				</c:forEach> 	
+				</c:if>
+				
+				<c:if test="${empty adminprodList}">
+					<thead id = "tableHead">
+						<tr>
+							<th>상품번호</th>
+							<th>카테고리명</th>
+							<th>상품명</th>
+							<th>재고</th>
+							<th>가격</th>
+							<th>날짜</th>
+							<th>성별</th>
+						</tr>
+					</thead>
+					<tbody id = "tableBody">
+						<tr>
+							<td colspan="7" style="border: none; font-weight: bold; color: #8A6C4F;">검색 결과가 없습니다</td>
+						</tr>	
+					</tbody>
+				</c:if>			
 			</tbody>
 		</table>
 	</div>
