@@ -562,1306 +562,1317 @@ public class ProductDAO implements InterProductDAO {
 	      return adminProdList;
 	   }
 	   
-	   // 관리자 페이지에서 상품(번호, 카테고리, 상품명, 재고, 가격, 성별) 리스트 가져오는(select) 메소드(검색결과도 같이 조회 할 수 있도록) (JIEUN)
-	   @Override
-	   public List<ProductVO> adminProductListAll(Map<String, String> paraMap) throws SQLException {
-	      
-	      List<ProductVO> adminprodList = new ArrayList<ProductVO>();
-	      
-	      try {
-	         
-	         conn = ds.getConnection();
-	         
-	         String sql = " select pdno, pdcategory_fk, cgname, pdname, pdimage1, pdimage2, pdqty, price, saleprice, pdinputdate, pdgender "+
-	                   " from "+
-	                   "      ( "+
-	                   "         select rownum AS rno, pdno, pdcategory_fk, cgname, pdname, pdimage1, pdimage2, pdqty, price, saleprice, pdinputdate, pdgender "+
-	                   "         from "+
-	                   "         ( "+
-	                   "           select p.pdno, p.pdcategory_fk, c.cgname, p.pdname, p.pdimage1, p.pdimage2, p.pdqty, p.price, p.saleprice, p.pdinputdate, p.pdgender ";
+	   	// 관리자 페이지에서 상품(번호, 카테고리, 상품명, 재고, 가격, 성별) 리스트 가져오는(select) 메소드(검색결과도 같이 조회 할 수 있도록) (JIEUN)
+	@Override
+	public List<ProductVO> adminProductListAll(Map<String, String> paraMap) throws SQLException {
+		
+		List<ProductVO> adminprodList = new ArrayList<ProductVO>();
+		
+		try {
+			
+			conn = ds.getConnection();
+			
+			String sql = " select pdno, pdcategory_fk, cgname, pdname, pdimage1, pdimage2, pdqty, price, saleprice, pdinputdate, pdgender "+
+						 " from "+
+						 "		( "+
+						 "    	  select rownum AS rno, pdno, pdcategory_fk, cgname, pdname, pdimage1, pdimage2, pdqty, price, saleprice, pdinputdate, pdgender "+
+						 "    	  from "+
+						 "    	  ( "+
+						 "        	select p.pdno, p.pdcategory_fk, c.cgname, p.pdname, p.pdimage1, p.pdimage2, p.pdqty, p.price, p.saleprice, p.pdinputdate, p.pdgender ";
 
-	         
-	         String searchType = paraMap.get("searchType");
-	         String prodRegType = paraMap.get("prodRegType");
-	         
-	         
-	         if( "pdname".equals(searchType)) {
-	         
-	            searchType = "p.pdname like '%'|| ? ||'%' ";
-	            
-	         }
-	         else if ("cgname".equals(searchType)) {
-	            
-	            searchType = "c.cgname like '%'|| ? ||'%' ";
-	            
-	         }
-	         else { // 전체인 경우에는 상품명 또는 카테고리명을 동시에 검색
-	            
-	            searchType = " p.pdname like '%'|| ? ||'%' or c.cgname like '%'|| ? ||'%' ";
-	            
-	         }
-	         
-	         if( "week".equals(prodRegType)) {
-	            prodRegType = " p.pdinputdate > (sysdate - 7) ";
-	         }
-	         else if( "oneM".equals(prodRegType)) {
-	            prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -1), 'yy/mm/dd') ";
-	         }
-	         else if( "thrM".equals(prodRegType)) {
-	            prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -3), 'yy/mm/dd') ";
-	         }
-	         else if( "sixM".equals(prodRegType)) {
-	            prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -6), 'yy/mm/dd') ";
-	         }
-	         else if( "year".equals(prodRegType)) {
-	            prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -12), 'yy/mm/dd') ";
-	         }         
-	         
-	         
-	         if( "1".equals(paraMap.get("pdgender")) || "2".equals(paraMap.get("pdgender")) ) {
-	            // 성별이 여자 또는  남자라면
+			
+			String searchType = paraMap.get("searchType");
+			String prodRegType = paraMap.get("prodRegType");
+			
+			
+			if( "pdname".equals(searchType)) {
+			
+				searchType = "p.pdname like '%'|| ? ||'%' ";
+				
+			}
+			else if ("cgname".equals(searchType)) {
+				
+				searchType = "c.cgname like '%'|| ? ||'%' ";
+				
+			}
+			else { // 전체인 경우에는 상품명 또는 카테고리명을 동시에 검색
+				
+				searchType = " p.pdname like '%'|| ? ||'%' and c.cgname like '%'|| ? ||'%' ";
+				
+			}
+			
+			if( "week".equals(prodRegType)) {
+				prodRegType = " p.pdinputdate > (sysdate - 7) ";
+			}
+			else if( "oneM".equals(prodRegType)) {
+				prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -1), 'yy/mm/dd') ";
+			}
+			else if( "thrM".equals(prodRegType)) {
+				prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -3), 'yy/mm/dd') ";
+			}
+			else if( "sixM".equals(prodRegType)) {
+				prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -6), 'yy/mm/dd') ";
+			}
+			else if( "year".equals(prodRegType)) {
+				prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -12), 'yy/mm/dd') ";
+			}			
+			
+			
+			if( "1".equals(paraMap.get("pdgender")) || "2".equals(paraMap.get("pdgender")) ) {
+				// 성별이 여자 또는  남자라면
+				System.out.println("성별이 여자 또는 남자");
+				
+				if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
+					// 검색 키워드(검색명)가 없을때 (전체 검색)
+					System.out.println("성별이 여자 또는 남자이고 검색 키워드가 없다");
+					System.out.println("성별 ==>  " + paraMap.get("pdgender"));
+					System.out.println("검색 타입 ==>  " + paraMap.get("searchType"));
+					System.out.println("검색 키워드 ==>  " + paraMap.get("searchWord"));	
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+						
+						System.out.println("성별이 여자 또는 남자이고 검색 키워드가 없고 상품등록일이 일주일이라면~~~~");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and " + prodRegType;
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면
+						
+						System.out.println("성별이 여자 또는 남자이고 검색 키워드가 없고 상품등록일이 한달이라면");					
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and " + prodRegType;							
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						System.out.println("성별이 여자 또는 남자이고 검색 키워드가 없고 상품등록일이 세달이라면");					
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and " + prodRegType;
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						System.out.println("성별이 여자 또는 남자이고 검색 키워드가 없고 상품등록일이 6달이라면");				
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and " + prodRegType;							
+						
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						System.out.println("성별이 여자 또는 남자이고 검색 키워드가 없고 상품등록일이 1년 이라면");				
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and " + prodRegType;								
+						
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
+						System.out.println("성별이 여자 또는 남자이고 검색 키워드가 없고 상품등록일이 전체");					
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? ";	
+					}
+					
+					
+				} // 검색 키워드(검색명)이 없을때 끝----------------------------------
+				
+				else {
+					// 검색 키워드(검색명)가 있을때
+					System.out.println("성별이 여자 또는 남자이고 검색 키워드가 있다 ");
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+						System.out.println("성별이 여자 또는 남자이고 검색 키워드가 있고 상품등록일이 일주일이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면
+						
+						System.out.println("성별이 여자 또는 남자이고 검색 키워드가 있고 상품등록일이 한달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						System.out.println("성별이 여자 또는 남자이고 검색 키워드가 있고 상품등록일이 3달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						System.out.println("성별이 여자 또는 남자이고 검색 키워드가 있고 상품등록일이 6달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						System.out.println("성별이 여자 또는 남자이고 검색 키워드가 있고 상품등록일이 12달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
+						System.out.println("성별이 여자 또는 남자이고 검색 키워드가 있고 상품등록일이 전체이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and "+ searchType ;
+						
+					}					
+					
+				} // 검색 키워드(검색명)이 있을때 끝----------------------------------
+				
+			}
+			else {
+				// 성별이 전체라면
+				System.out.println("성별이 전체");
+				
+				if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
+					// 검색 키워드(검색명)가 없을때 (전체 검색)
+					System.out.println("성별이 전체이고 검색 키워드가 없다");
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 일주일이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where " + prodRegType;
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 1달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where " + prodRegType;							
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						
+						System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 3달이라면");
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where " + prodRegType;
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 6달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where " + prodRegType;							
+						
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 12달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where " + prodRegType;								
+						
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
+						System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 전체이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno ";
+					}
+					
+					
+				} // 검색 키워드(검색명)이 없을때 끝----------------------------------
+				
+				else {
+					// 검색 키워드(검색명)가 있을때
+					System.out.println("성별이 전체이고 검색 키워드가 있다");
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 일주일이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where "+ searchType +" and " + prodRegType;
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 한달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where "+ searchType +" and " + prodRegType;
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 3달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where "+ searchType +" and " + prodRegType;
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 6달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where "+ searchType +" and " + prodRegType;
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 12이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where "+ searchType +" and " + prodRegType;
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where "+ searchType ;
+						
+					}					
+					
+				} // 검색 키워드(검색명)이 있을때 끝----------------------------------				
+				
+			} // 성별 전체 끝---------------------------------------------------
+			
+			sql += "    ) V"  + 
+				   " ) T " +
+				   " where rno between ? and ? ";	
 
-		       if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
-	               // 검색 키워드(검색명)가 없을때 (전체 검색)
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and " + prodRegType;
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and " + prodRegType;                     
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and " + prodRegType;
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and " + prodRegType;                     
-	                  
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and " + prodRegType;                        
-	                  
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? ";   
-	               }
-	               
-	               
-	            } // 검색 키워드(검색명)이 없을때 끝----------------------------------
-	            
-	            else {
-	               // 검색 키워드(검색명)가 있을때
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and "+ searchType ;
-	                  
-	               }               
-	               
-	            } // 검색 키워드(검색명)이 있을때 끝----------------------------------
-	            
-	         }
-	         else {
-	            // 성별이 전체라면
-	            
-	            if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
-	               // 검색 키워드(검색명)가 없을때 (전체 검색)
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where " + prodRegType;
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where " + prodRegType;                     
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where " + prodRegType;
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where " + prodRegType;                     
-	                  
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where " + prodRegType;                        
-	                  
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno ";
-	               }
-	               
-	               
-	            } // 검색 키워드(검색명)이 없을때 끝----------------------------------
-	            
-	            else {
-	               // 검색 키워드(검색명)가 있을때
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where "+ searchType +" and " + prodRegType;
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where "+ searchType +" and " + prodRegType;
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where "+ searchType +" and " + prodRegType;
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where "+ searchType +" and " + prodRegType;
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where "+ searchType +" and " + prodRegType;
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where "+ searchType ;
-	                  
-	               }               
-	               
-	            } // 검색 키워드(검색명)이 있을때 끝----------------------------------            
-	            
-	         } // 성별 전체 끝---------------------------------------------------
-	         
-	         sql += "    ) V"  + 
-	               " ) T " +
-	               " where rno between ? and ? ";   
+			pstmt = conn.prepareStatement(sql);
+			
+			int currentShowPageNo = Integer.parseInt(paraMap.get("currentShowPageNo")); // 보내준 현재 페이지 번호
+			int sizePerPage = Integer.parseInt(paraMap.get("sizePerPage"));	// 보내준 페이지당 목록 개수			
+			
+			if( "1".equals(paraMap.get("pdgender")) || "2".equals(paraMap.get("pdgender")) ) {
+				// 성별이 여자 또는  남자라면
+				
+				if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
+					// 검색 키워드(검색명)가 없을때 (전체 검색)
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+						
+						pstmt.setString(1, paraMap.get("pdgender"));
+						pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+						pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면
+						
+						pstmt.setString(1, paraMap.get("pdgender"));
+						pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+						pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식					
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						
+						pstmt.setString(1, paraMap.get("pdgender"));
+						pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+						pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						
+						pstmt.setString(1, paraMap.get("pdgender"));
+						pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+						pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식						
+						
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						
+						pstmt.setString(1, paraMap.get("pdgender"));
+						pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+						pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식			
+						
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
 
-	         pstmt = conn.prepareStatement(sql);
-	         
-	         int currentShowPageNo = Integer.parseInt(paraMap.get("currentShowPageNo")); // 보내준 현재 페이지 번호
-	         int sizePerPage = Integer.parseInt(paraMap.get("sizePerPage"));   // 보내준 페이지당 목록 개수         
-	         
-	         if( "1".equals(paraMap.get("pdgender")) || "2".equals(paraMap.get("pdgender")) ) {
-	            // 성별이 여자 또는  남자라면
-	            
-	            if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
-	               // 검색 키워드(검색명)가 없을때 (전체 검색)
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-	                  
-	                  pstmt.setString(1, paraMap.get("pdgender"));
-	                  pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                  pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면
-	                  
-	                  pstmt.setString(1, paraMap.get("pdgender"));
-	                  pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                  pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식               
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  
-	                  pstmt.setString(1, paraMap.get("pdgender"));
-	                  pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                  pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  
-	                  pstmt.setString(1, paraMap.get("pdgender"));
-	                  pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                  pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식                  
-	                  
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  
-	                  pstmt.setString(1, paraMap.get("pdgender"));
-	                  pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                  pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식         
-	                  
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
+						pstmt.setString(1, paraMap.get("pdgender"));
+						pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+						pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식	
+					}
+					
+					
+				} // 검색 키워드(검색명)이 없을때 끝----------------------------------
+				
+				else {
+					// 검색 키워드(검색명)가 있을때
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("pdgender"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
+						} 
+						else {
+							// 검색분류가 전체인 경우
 
-	                  pstmt.setString(1, paraMap.get("pdgender"));
-	                  pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                  pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식   
-	               }
-	               
-	               
-	            } // 검색 키워드(검색명)이 없을때 끝----------------------------------
-	            
-	            else {
-	               // 검색 키워드(검색명)가 있을때
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
+							pstmt.setString(1, paraMap.get("pdgender"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setString(3, paraMap.get("searchWord"));							
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식			
+						}
+					
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("pdgender"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
+						} 
+						else {
+							// 검색분류가 전체인 경우
 
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));                     
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식         
-	                  }
-	               
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
+							pstmt.setString(1, paraMap.get("pdgender"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setString(3, paraMap.get("searchWord"));							
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식			
+						}
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("pdgender"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
+						} 
+						else {
+							// 검색분류가 전체인 경우
 
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));                     
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식         
-	                  }
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
+							pstmt.setString(1, paraMap.get("pdgender"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setString(3, paraMap.get("searchWord"));							
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식			
+						}
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("pdgender"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
+						} 
+						else {
+							// 검색분류가 전체인 경우
 
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));                     
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식         
-	                  }
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
+							pstmt.setString(1, paraMap.get("pdgender"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setString(3, paraMap.get("searchWord"));							
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식			
+						}
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("pdgender"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
+						} 
+						else {
+							// 검색분류가 전체인 경우
 
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));                     
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식         
-	                  }
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
+							pstmt.setString(1, paraMap.get("pdgender"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setString(3, paraMap.get("searchWord"));							
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식			
+						}
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("pdgender"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
+						} 
+						else {
+							// 검색분류가 전체인 경우
 
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));                     
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식         
-	                  }
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
+							pstmt.setString(1, paraMap.get("pdgender"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setString(3, paraMap.get("searchWord"));							
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식			
+						}
+						
+					}					
+					
+				} // 검색 키워드(검색명)이 있을때 끝----------------------------------
+				
+			}
+			else {
+				// 성별이 전체라면
+				
+				if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
+					// 검색 키워드(검색명)가 없을때 (전체 검색)
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+						
+						pstmt.setInt(1, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+						pstmt.setInt(2, (currentShowPageNo * sizePerPage) ); // 공식
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면
+						
+						pstmt.setInt(1, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+						pstmt.setInt(2, (currentShowPageNo * sizePerPage) ); // 공식					
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						
+						pstmt.setInt(1, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+						pstmt.setInt(2, (currentShowPageNo * sizePerPage) ); // 공식
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						
+						pstmt.setInt(1, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+						pstmt.setInt(2, (currentShowPageNo * sizePerPage) ); // 공식						
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						
+						pstmt.setInt(1, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+						pstmt.setInt(2, (currentShowPageNo * sizePerPage) ); // 공식							
+						
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
 
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));                     
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식         
-	                  }
-	                  
-	               }               
-	               
-	            } // 검색 키워드(검색명)이 있을때 끝----------------------------------
-	            
-	         }
-	         else {
-	            // 성별이 전체라면
-	            
-	            if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
-	               // 검색 키워드(검색명)가 없을때 (전체 검색)
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-	                  
-	                  pstmt.setInt(1, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                  pstmt.setInt(2, (currentShowPageNo * sizePerPage) ); // 공식
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면
-	                  
-	                  pstmt.setInt(1, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                  pstmt.setInt(2, (currentShowPageNo * sizePerPage) ); // 공식               
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  
-	                  pstmt.setInt(1, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                  pstmt.setInt(2, (currentShowPageNo * sizePerPage) ); // 공식
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  
-	                  pstmt.setInt(1, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                  pstmt.setInt(2, (currentShowPageNo * sizePerPage) ); // 공식                  
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  
-	                  pstmt.setInt(1, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                  pstmt.setInt(2, (currentShowPageNo * sizePerPage) ); // 공식                     
-	                  
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
+						pstmt.setInt(1, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+						pstmt.setInt(2, (currentShowPageNo * sizePerPage) ); // 공식
+					}
+					
+					
+				} // 검색 키워드(검색명)이 없을때 끝----------------------------------
+				
+				else {
+					// 검색 키워드(검색명)가 있을때
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("searchWord"));
+							pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식
+						} 
+						else {
+							// 검색분류가 전체인 경우
 
-	                  pstmt.setInt(1, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                  pstmt.setInt(2, (currentShowPageNo * sizePerPage) ); // 공식
-	               }
-	               
-	               
-	            } // 검색 키워드(검색명)이 없을때 끝----------------------------------
-	            
-	            else {
-	               // 검색 키워드(검색명)가 있을때
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
+							pstmt.setString(1, paraMap.get("searchWord"));
+							pstmt.setString(2, paraMap.get("searchWord"));							
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식			
+						}
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("searchWord"));
+							pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식
+						} 
+						else {
+							// 검색분류가 전체인 경우
 
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));                     
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식         
-	                  }
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
+							pstmt.setString(1, paraMap.get("searchWord"));
+							pstmt.setString(2, paraMap.get("searchWord"));							
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식				
+						}
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("searchWord"));
+							pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식
+						} 
+						else {
+							// 검색분류가 전체인 경우
 
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));                     
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식         
-	                  }
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
+							pstmt.setString(1, paraMap.get("searchWord"));
+							pstmt.setString(2, paraMap.get("searchWord"));							
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식			
+						}
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("searchWord"));
+							pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식
+						} 
+						else {
+							// 검색분류가 전체인 경우
 
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));                     
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식         
-	                  }
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
+							pstmt.setString(1, paraMap.get("searchWord"));
+							pstmt.setString(2, paraMap.get("searchWord"));							
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식		
+						}
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("searchWord"));
+							pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식
+						} 
+						else {
+							// 검색분류가 전체인 경우
 
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));                     
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식         
-	                  }
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
+							pstmt.setString(1, paraMap.get("searchWord"));
+							pstmt.setString(2, paraMap.get("searchWord"));							
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식			
+						}
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("searchWord"));
+							pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) ); // 공식
+						} 
+						else {
+							// 검색분류가 전체인 경우
 
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));                     
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식         
-	                  }
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
-
-	                     pstmt.setString(1, paraMap.get("pdgender"));
-	                     pstmt.setString(2, paraMap.get("searchWord"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));                     
-	                     pstmt.setInt(4, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
-	                     pstmt.setInt(5, (currentShowPageNo * sizePerPage) ); // 공식         
-	                  }
-	                  
-	               }               
-	               
-	            } // 검색 키워드(검색명)이 있을때 끝----------------------------------            
-	            
-	         } // 성별 전체 끝---------------------------------------------------         
-	         
-	         
-	         
-	          rs = pstmt.executeQuery();
+							pstmt.setString(1, paraMap.get("searchWord"));
+							pstmt.setString(2, paraMap.get("searchWord"));							
+							pstmt.setInt(3, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+							pstmt.setInt(4, (currentShowPageNo * sizePerPage) ); // 공식	
+						}
+						
+					}					
+					
+				} // 검색 키워드(검색명)이 있을때 끝----------------------------------				
+				
+			} // 성별 전체 끝---------------------------------------------------			
+			
+			
+			
+		rs = pstmt.executeQuery();
+	          
+	        while(rs.next()) {
 	             
-	           while(rs.next()) {
-	                
-	              ProductVO pvo = new ProductVO();
-	              // pdno, pdcategory_fk, cgname, pdname, pdimage1, pdimage2, pdqty, price, saleprice, pdinputdate, pdgender
-	              
-	               pvo.setPdno( rs.getInt(1) ); 
-	              pvo.setPdcategory_fk(rs.getString(2));
-	              
-	              CategoryVO catevo = new CategoryVO();
-	              catevo.setCgname(rs.getString(3));
-	              
-	              pvo.setCatevo(catevo);
-	              
-	              pvo.setPdname( rs.getString(4) );
-	              pvo.setPdimage1(rs.getString(5));
-	              pvo.setPdimage2(rs.getString(6));
-	              pvo.setPdqty(rs.getInt(7));
-	              pvo.setPrice(rs.getInt(8));
-	              pvo.setSaleprice(rs.getInt(9));
-	              pvo.setPdinputdate(rs.getString(10));
-	              pvo.setPdgender(rs.getString(11));
-	                
-	              adminprodList.add(pvo);
-	                
-	           }// end of while-------------------------         
+	           ProductVO pvo = new ProductVO();
+	           // pdno, pdcategory_fk, cgname, pdname, pdimage1, pdimage2, pdqty, price, saleprice, pdinputdate, pdgender
+	           
+                   pvo.setPdno( rs.getInt(1) ); 
+	           pvo.setPdcategory_fk(rs.getString(2));
+	           
+	           CategoryVO catevo = new CategoryVO();
+	           catevo.setCgname(rs.getString(3));
+	           
+	           pvo.setCatevo(catevo);
+	           
+	           pvo.setPdname( rs.getString(4) );
+	           pvo.setPdimage1(rs.getString(5));
+	           pvo.setPdimage2(rs.getString(6));
+	           pvo.setPdqty(rs.getInt(7));
+	           pvo.setPrice(rs.getInt(8));
+	           pvo.setSaleprice(rs.getInt(9));
+	           pvo.setPdinputdate(rs.getString(10));
+	           pvo.setPdgender(rs.getString(11));
+	             
+	           adminprodList.add(pvo);
+	             
+	        }// end of while-------------------------			
 
-	         
-	      } finally {
-	         close();
-	      }
-	      
-	      return adminprodList;
-	   }
+			
+		} finally {
+			close();
+		}
+		
+		return adminprodList;
+	}			
 	   
-	   // 페이징 처리를 위해서 총 페이지 개수를  알아오기(select) (JIEUN)
-	   @Override
-	   public int getTotalPage(Map<String, String> paraMap) throws SQLException {
-	      
-	      int totalPage = 0;
-	      
-	      try {
-	         
-	         conn = ds.getConnection();
-	         
-	         String sql = " select ceil( count(*)/ ? ) ";
+	// 페이징 처리를 위해서 총 페이지 개수를  알아오기(select) (JIEUN)
+	@Override
+	public int getTotalPage(Map<String, String> paraMap) throws SQLException {
+		
+		int totalPage = 0;
+		
+		try {
+			
+			conn = ds.getConnection();
+			
+			String sql = " select ceil( count(*)/ ? ) ";
+	          
+			String searchType = paraMap.get("searchType");
+			String prodRegType = paraMap.get("prodRegType");
+			
+			
+			if( "pdname".equals(searchType)) {
+				searchType = "p.pdname like '%'|| ? ||'%' ";
+			}
+			else if ("cgname".equals(searchType)) {
+				searchType = "c.cgname like '%'|| ? ||'%' ";
+			}
+			else { // 전체인 경우에는 상품명 또는 카테고리명을 동시에 검색
+				searchType = " p.pdname like '%'|| ? ||'%' and c.cgname like '%'|| ? ||'%' ";
+			}
+			
+			if( "week".equals(prodRegType)) {
+				prodRegType = " p.pdinputdate > (sysdate - 7) ";
+			}
+			else if( "oneM".equals(prodRegType)) {
+				prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -1), 'yy/mm/dd') ";
+			}
+			else if( "thrM".equals(prodRegType)) {
+				prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -3), 'yy/mm/dd') ";
+			}
+			else if( "sixM".equals(prodRegType)) {
+				prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -6), 'yy/mm/dd') ";
+			}
+			else if( "year".equals(prodRegType)) {
+				prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -12), 'yy/mm/dd') ";
+			}			
+
+			if( "1".equals(paraMap.get("pdgender")) || "2".equals(paraMap.get("pdgender")) ) {
+				// 성별이 여자 또는  남자라면
+				
+				if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
+					// 검색 키워드(검색명)가 없을때 (전체 검색)
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and " + prodRegType;
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and " + prodRegType;							
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and " + prodRegType;
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and " + prodRegType;							
+						
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and " + prodRegType;								
+						
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? ";	
+					}
+					
+					
+				} // 검색 키워드(검색명)이 없을때 끝----------------------------------
+				
+				else {
+					// 검색 키워드(검색명)가 있을때
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where p.pdgender = ? and "+ searchType ;
+						
+					}					
+					
+				} // 검색 키워드(검색명)이 있을때 끝----------------------------------
+				
+			}
+			else {
+				// 성별이 전체라면
+				System.out.println("성별이 전체");
+				
+				if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
+					// 검색 키워드(검색명)가 없을때 (전체 검색)
+					System.out.println("성별이 전체이고 검색 키워드가 없다");
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 일주일이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where " + prodRegType;
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 1달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where " + prodRegType;							
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 3달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where " + prodRegType;
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 6달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where " + prodRegType;							
+						
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 12달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where " + prodRegType;								
+						
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
+						System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 전체이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno ";
+					}
+					
+					
+				} // 검색 키워드(검색명)이 없을때 끝----------------------------------
+				
+				else {
+					// 검색 키워드(검색명)가 있을때
+					System.out.println("성별이 전체이고 검색 키워드가 있다");
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 일주일이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where "+ searchType +" and " + prodRegType;
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 한달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where "+ searchType +" and " + prodRegType;
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 3달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where "+ searchType +" and " + prodRegType;
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 6달이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where "+ searchType +" and " + prodRegType;
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 12이라면");
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where "+ searchType +" and " + prodRegType;
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
+						
+						sql +=  " from tbl_product p join tbl_category c "+
+								" on p.pdcategory_fk = c.cgno " +		
+						        " where "+ searchType ;
+						
+					}					
+					
+				} // 검색 키워드(검색명)이 있을때 끝----------------------------------				
+				
+			} // 성별 전체 끝---------------------------------------------------
+
+			pstmt = conn.prepareStatement(sql);
+			
+			if( "1".equals(paraMap.get("pdgender")) || "2".equals(paraMap.get("pdgender")) ) {
+				// 성별이 여자 또는  남자라면
+				
+				if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
+					// 검색 키워드(검색명)가 없을때 (전체 검색)
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+						pstmt.setString(1, paraMap.get("sizePerPage"));
+						pstmt.setString(2, paraMap.get("pdgender"));
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면
+						pstmt.setString(1, paraMap.get("sizePerPage"));
+						pstmt.setString(2, paraMap.get("pdgender"));
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						pstmt.setString(1, paraMap.get("sizePerPage"));
+						pstmt.setString(2, paraMap.get("pdgender"));
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						pstmt.setString(1, paraMap.get("sizePerPage"));
+						pstmt.setString(2, paraMap.get("pdgender"));
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						pstmt.setString(1, paraMap.get("sizePerPage"));
+						pstmt.setString(2, paraMap.get("pdgender"));
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
+
+						pstmt.setString(1, paraMap.get("sizePerPage"));
+						pstmt.setString(2, paraMap.get("pdgender"));
+					}
+					
+					
+				} // 검색 키워드(검색명)이 없을때 끝----------------------------------
+				
+				else {
+					// 검색 키워드(검색명)가 있을때
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("pdgender"));
+							pstmt.setString(3, paraMap.get("searchWord"));
+							
+						} 
+						else {
+							// 검색분류가 전체인 경우
+
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("pdgender"));
+							pstmt.setString(3, paraMap.get("searchWord"));
+							pstmt.setString(4, paraMap.get("searchWord"));							
+						}
+					
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("pdgender"));
+							pstmt.setString(3, paraMap.get("searchWord"));
+						} 
+						else {
+							// 검색분류가 전체인 경우
+
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("pdgender"));
+							pstmt.setString(3, paraMap.get("searchWord"));
+							pstmt.setString(4, paraMap.get("searchWord"));								
+						}
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("pdgender"));
+							pstmt.setString(3, paraMap.get("searchWord"));
+						} 
+						else {
+							// 검색분류가 전체인 경우
+
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("pdgender"));
+							pstmt.setString(3, paraMap.get("searchWord"));
+							pstmt.setString(4, paraMap.get("searchWord"));								
+						}
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("pdgender"));
+							pstmt.setString(3, paraMap.get("searchWord"));
+						} 
+						else {
+							// 검색분류가 전체인 경우
+
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("pdgender"));
+							pstmt.setString(3, paraMap.get("searchWord"));
+							pstmt.setString(4, paraMap.get("searchWord"));								
+						}
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("pdgender"));
+							pstmt.setString(3, paraMap.get("searchWord"));
+						} 
+						else {
+							// 검색분류가 전체인 경우
+
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("pdgender"));
+							pstmt.setString(3, paraMap.get("searchWord"));
+							pstmt.setString(4, paraMap.get("searchWord"));							
+						}
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("pdgender"));
+							pstmt.setString(3, paraMap.get("searchWord"));
+						} 
+						else {
+							// 검색분류가 전체인 경우
+
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("pdgender"));
+							pstmt.setString(3, paraMap.get("searchWord"));
+							pstmt.setString(4, paraMap.get("searchWord"));	
+													
+						}
+						
+					}					
+					
+				} // 검색 키워드(검색명)이 있을때 끝----------------------------------
+				
+			}
+			else {
+				// 성별이 전체라면
+				
+				if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
+					// 검색 키워드(검색명)가 없을때 (전체 검색)
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+						pstmt.setString(1, paraMap.get("sizePerPage"));
+						
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면				
+						pstmt.setString(1, paraMap.get("sizePerPage"));
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						pstmt.setString(1, paraMap.get("sizePerPage"));
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						pstmt.setString(1, paraMap.get("sizePerPage"));	
+											
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						pstmt.setString(1, paraMap.get("sizePerPage"));
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
+						pstmt.setString(1, paraMap.get("sizePerPage"));	
+					}
+					
+					
+				} // 검색 키워드(검색명)이 없을때 끝----------------------------------
+				
+				else {
+					// 검색 키워드(검색명)가 있을때
+					
+					if("week".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일주일 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+						
+						} 
+						else {
+							// 검색분류가 전체인 경우
+
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setString(3, paraMap.get("searchWord"));							
+								
+						}
+					}
+					else if("oneM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 한달 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							
+						} 
+						else {
+							// 검색분류가 전체인 경우
+							
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setString(3, paraMap.get("searchWord"));								
+								
+						}
+					}
+					else if("thrM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 세달 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+
+						} 
+						else {
+							// 검색분류가 전체인 경우
+
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setString(3, paraMap.get("searchWord"));									
+	
+						}
+					}
+					else if("sixM".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 여섯달 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+
+						} 
+						else {
+							// 검색분류가 전체인 경우
+
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setString(3, paraMap.get("searchWord"));								
+		
+						}
+					}
+					else if("year".equals(paraMap.get("prodRegType")) ) {
+						// 상품등록일이 일년 이라면
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+
+						} 
+						else {
+							// 검색분류가 전체인 경우
+
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setString(3, paraMap.get("searchWord"));										
+		
+						}
+					}
+					else {
+						// 상품등록일이 전체이라면(조건없음)
+						
+						if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
+							// 검색분류가 pdname이나 chname인 경우
+							
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+
+						} 
+						else {
+							// 검색분류가 전체인 경우
+
+							pstmt.setString(1, paraMap.get("sizePerPage"));
+							pstmt.setString(2, paraMap.get("searchWord"));
+							pstmt.setString(3, paraMap.get("searchWord"));								
+		
+						}
+						
+					}					
+					
+				} // 검색 키워드(검색명)이 있을때 끝----------------------------------				
+				
+			} // 성별 전체 끝---------------------------------------------------			
+			
+			
+			
+		    rs = pstmt.executeQuery();
+	          
+		    rs.next();
 	             
-	         String searchType = paraMap.get("searchType");
-	         String prodRegType = paraMap.get("prodRegType");
-	         
-	         
-	         if( "pdname".equals(searchType)) {
-	            searchType = "p.pdname like '%'|| ? ||'%' ";
-	         }
-	         else if ("cgname".equals(searchType)) {
-	            searchType = "c.cgname like '%'|| ? ||'%' ";
-	         }
-	         else { // 전체인 경우에는 상품명 또는 카테고리명을 동시에 검색
-	            searchType = " p.pdname like '%'|| ? ||'%' or c.cgname like '%'|| ? ||'%' ";
-	         }
-	         
-	         if( "week".equals(prodRegType)) {
-	            prodRegType = " p.pdinputdate > (sysdate - 7) ";
-	         }
-	         else if( "oneM".equals(prodRegType)) {
-	            prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -1), 'yy/mm/dd') ";
-	         }
-	         else if( "thrM".equals(prodRegType)) {
-	            prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -3), 'yy/mm/dd') ";
-	         }
-	         else if( "sixM".equals(prodRegType)) {
-	            prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -6), 'yy/mm/dd') ";
-	         }
-	         else if( "year".equals(prodRegType)) {
-	            prodRegType = " p.pdinputdate > to_char(add_months(sysdate, -12), 'yy/mm/dd') ";
-	         }         
-
-	         if( "1".equals(paraMap.get("pdgender")) || "2".equals(paraMap.get("pdgender")) ) {
-	            // 성별이 여자 또는  남자라면
-	            
-	            if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
-	               // 검색 키워드(검색명)가 없을때 (전체 검색)
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and " + prodRegType;
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and " + prodRegType;                     
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and " + prodRegType;
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and " + prodRegType;                     
-	                  
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and " + prodRegType;                        
-	                  
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? ";   
-	               }
-	               
-	               
-	            } // 검색 키워드(검색명)이 없을때 끝----------------------------------
-	            
-	            else {
-	               // 검색 키워드(검색명)가 있을때
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and "+ searchType +" and " + prodRegType;
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where p.pdgender = ? and "+ searchType ;
-	                  
-	               }               
-	               
-	            } // 검색 키워드(검색명)이 있을때 끝----------------------------------
-	            
-	         }
-	         else {
-	            // 성별이 전체라면
-	            System.out.println("성별이 전체");
-	            
-	            if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
-	               // 검색 키워드(검색명)가 없을때 (전체 검색)
-	               System.out.println("성별이 전체이고 검색 키워드가 없다");
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 일주일이라면");
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where " + prodRegType;
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 1달이라면");
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where " + prodRegType;                     
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 3달이라면");
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where " + prodRegType;
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 6달이라면");
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where " + prodRegType;                     
-	                  
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 12달이라면");
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where " + prodRegType;                        
-	                  
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
-	                  System.out.println("성별이 전체이고 검색 키워드가 없고 상품등록일이 전체이라면");
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno ";
-	               }
-	               
-	               
-	            } // 검색 키워드(검색명)이 없을때 끝----------------------------------
-	            
-	            else {
-	               // 검색 키워드(검색명)가 있을때
-	               System.out.println("성별이 전체이고 검색 키워드가 있다");
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 일주일이라면");
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where "+ searchType +" and " + prodRegType;
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 한달이라면");
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where "+ searchType +" and " + prodRegType;
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 3달이라면");
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where "+ searchType +" and " + prodRegType;
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 6달이라면");
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where "+ searchType +" and " + prodRegType;
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  System.out.println("성별이 전체이고 검색 키워드가 있고 상품등록일이 12이라면");
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where "+ searchType +" and " + prodRegType;
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
-	                  
-	                  sql +=  " from tbl_product p join tbl_category c "+
-	                        " on p.pdcategory_fk = c.cgno " +      
-	                          " where "+ searchType ;
-	                  
-	               }               
-	               
-	            } // 검색 키워드(검색명)이 있을때 끝----------------------------------            
-	            
-	         } // 성별 전체 끝---------------------------------------------------
-
-	         pstmt = conn.prepareStatement(sql);
-	         
-	         if( "1".equals(paraMap.get("pdgender")) || "2".equals(paraMap.get("pdgender")) ) {
-	            // 성별이 여자 또는  남자라면
-	            
-	            if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
-	               // 검색 키워드(검색명)가 없을때 (전체 검색)
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-	                  pstmt.setString(1, paraMap.get("sizePerPage"));
-	                  pstmt.setString(2, paraMap.get("pdgender"));
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면
-	                  pstmt.setString(1, paraMap.get("sizePerPage"));
-	                  pstmt.setString(2, paraMap.get("pdgender"));
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  pstmt.setString(1, paraMap.get("sizePerPage"));
-	                  pstmt.setString(2, paraMap.get("pdgender"));
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  pstmt.setString(1, paraMap.get("sizePerPage"));
-	                  pstmt.setString(2, paraMap.get("pdgender"));
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  pstmt.setString(1, paraMap.get("sizePerPage"));
-	                  pstmt.setString(2, paraMap.get("pdgender"));
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
-
-	                  pstmt.setString(1, paraMap.get("sizePerPage"));
-	                  pstmt.setString(2, paraMap.get("pdgender"));
-	               }
-	               
-	               
-	            } // 검색 키워드(검색명)이 없을때 끝----------------------------------
-	            
-	            else {
-	               // 검색 키워드(검색명)가 있을때
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                     
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
-
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                     pstmt.setString(4, paraMap.get("searchWord"));                     
-	                  }
-	               
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
-
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                     pstmt.setString(4, paraMap.get("searchWord"));                        
-	                  }
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
-
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                     pstmt.setString(4, paraMap.get("searchWord"));                        
-	                  }
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
-
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                     pstmt.setString(4, paraMap.get("searchWord"));                        
-	                  }
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
-
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                     pstmt.setString(4, paraMap.get("searchWord"));                     
-	                  }
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
-
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                     pstmt.setString(4, paraMap.get("searchWord"));   
-	                                       
-	                  }
-	                  
-	               }               
-	               
-	            } // 검색 키워드(검색명)이 있을때 끝----------------------------------
-	            
-	         }
-	         else {
-	            // 성별이 전체라면
-	            
-	            if("".equals(paraMap.get("searchWord")) || paraMap.get("searchWord") == null) {
-	               // 검색 키워드(검색명)가 없을때 (전체 검색)
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-	                  pstmt.setString(1, paraMap.get("sizePerPage"));
-	                  
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면            
-	                  pstmt.setString(1, paraMap.get("sizePerPage"));
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  pstmt.setString(1, paraMap.get("sizePerPage"));
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  pstmt.setString(1, paraMap.get("sizePerPage"));   
-	                                 
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  pstmt.setString(1, paraMap.get("sizePerPage"));
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
-	                  pstmt.setString(1, paraMap.get("sizePerPage"));   
-	               }
-	               
-	               
-	            } // 검색 키워드(검색명)이 없을때 끝----------------------------------
-	            
-	            else {
-	               // 검색 키워드(검색명)가 있을때
-	               
-	               if("week".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일주일 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                  
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
-
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                     pstmt.setString(4, paraMap.get("searchWord"));                     
-	                        
-	                  }
-	               }
-	               else if("oneM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 한달 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                     
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                     pstmt.setString(4, paraMap.get("searchWord"));                     
-	                        
-	                  }
-	               }
-	               else if("thrM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 세달 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
-
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                     pstmt.setString(4, paraMap.get("searchWord"));                     
-	   
-	                  }
-	               }
-	               else if("sixM".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 여섯달 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
-
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                     pstmt.setString(4, paraMap.get("searchWord"));                     
-	      
-	                  }
-	               }
-	               else if("year".equals(paraMap.get("prodRegType")) ) {
-	                  // 상품등록일이 일년 이라면
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
-
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                     pstmt.setString(4, paraMap.get("searchWord"));                        
-	      
-	                  }
-	               }
-	               else {
-	                  // 상품등록일이 전체이라면(조건없음)
-	                  
-	                  if( "pdname".equals(paraMap.get("searchType")) || "cgname".equals(paraMap.get("searchType")) ) { 
-	                     // 검색분류가 pdname이나 chname인 경우
-	                     
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-
-	                  } 
-	                  else {
-	                     // 검색분류가 전체인 경우
-
-	                     pstmt.setString(1, paraMap.get("sizePerPage"));
-	                     pstmt.setString(2, paraMap.get("pdgender"));
-	                     pstmt.setString(3, paraMap.get("searchWord"));
-	                     pstmt.setString(4, paraMap.get("searchWord"));                     
-	      
-	                  }
-	                  
-	               }               
-	               
-	            } // 검색 키워드(검색명)이 있을때 끝----------------------------------            
-	            
-	         } // 성별 전체 끝---------------------------------------------------         
-	         
-	         
-	         
-	          rs = pstmt.executeQuery();
-	             
-	          rs.next();
-	                
-	          totalPage = rs.getInt(1); // 첫번째 컬럼인  결과 받아서 totalPage에 넘겨주자   
-	         
-	         
-	      } finally {
-	         close();
-	      }
-	      
-	      
-	      return totalPage;
-	   }
+		    totalPage = rs.getInt(1); // 첫번째 컬럼인  결과 받아서 totalPage에 넘겨주자	
+			
+			
+		} finally {
+			close();
+		}
+		
+		
+		return totalPage;
+	}
 	   
 	   
 	   // 관리자페이지의 상품 관리 리스트 중 하나 클릭 했을때 pdno로 데이터를 받아서 상품정보 조회해서 받아오자(JIEUN)
