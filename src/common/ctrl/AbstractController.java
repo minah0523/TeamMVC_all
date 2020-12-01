@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import member.mdl.MemberVO;
+import my.util.MyUtil;
 
 public abstract class AbstractController implements InterCommand {
 	   /*
@@ -67,6 +68,11 @@ public abstract class AbstractController implements InterCommand {
 			// 로그인 안한 경우
 			return false;
 		}
+	}
+	
+	public void goBackURL(HttpServletRequest request) {
+	      HttpSession session = request.getSession();
+	      session.setAttribute("goBackURL", MyUtil.getCurrentURL(request));
 	}
 	
 }
