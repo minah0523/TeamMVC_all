@@ -15,7 +15,7 @@ import myshop.mdl.ProductInfoVO;
 import myshop.mdl.ProductVO;
 
 public class PayMentController extends AbstractController {
-
+	
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
@@ -26,31 +26,43 @@ public class PayMentController extends AbstractController {
 		// 장바구니 테이블에서 보내준 제품번호를 받아온다.
 		//request.getParameter("pdno");
 		
-		// 로그인된 유저의 아이디 정보를 받아온다.
-		String userid = ((MemberVO)session.getAttribute("loginuser")).getUserid(); 
-		//String userid = "admin";
-		// 유저 로그인이 완료될경우 주석문 해제
+		MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
 		
-		System.out.println(userid);
-		
-		// 캐러셀 이미지 name을 받아올 DTO객체를 생성
-		List<ImageVO> productList = pdao.ImageCarouselSelectAll();
-		
-		// 장바구니 테이블에 존재하는 row를 특정유저(로그인된 유저)의 아이디와 제품번호를 사용하여
-		// select 해온뒤 List에 담는다. List를 이용하여 반복문을 사용해 선택한 제품을 화면에 출력
-		List<ProductVO> cartList = pdao.getCartList(userid);
-		
-		
-		// 받아온 유저 ID를 기반으로 장바구니 테이블에 접근하여 제품번호, 색상, 사이즈를 얻어온다.
-		List<ProductInfoVO> productInfoList = pdao.getSizeAndColor(userid);
-		
-		request.setAttribute("imgList", productList);
-		request.setAttribute("productInfoList", productInfoList);
-		request.setAttribute("cartList", cartList);
-		
-		super.setRedirect(false);
-		super.setViewPage("/WEB-INF/Payment/Payment.jsp");
-		
+		if(loginuser == null) {
+			String message = "로그인이 필요한 서비스입니다.";
+			String loc = "/TeamMVC/login/loginPage.neige";
+			
+			request.setAttribute("message", message);
+			request.setAttribute("loc", loc);
+			
+			super.setRedirect(false);
+			super.setViewPage("/WEB-INF/msg.jsp");
+		}
+		else {
+			// 로그인된 유저의 아이디 정보를 받아온다.
+			String userid = loginuser.getUserid();
+			//String userid = "admin";
+			// 유저 로그인이 완료될경우 주석문 해제
+			
+			
+			// 캐러셀 이미지 name을 받아올 DTO객체를 생성
+			List<ImageVO> productList = pdao.ImageCarouselSelectAll();
+			
+			// 장바구니 테이블에 존재하는 row를 특정유저(로그인된 유저)의 아이디와 제품번호를 사용하여
+			// select 해온뒤 List에 담는다. List를 이용하여 반복문을 사용해 선택한 제품을 화면에 출력
+			List<ProductVO> cartList = pdao.getCartList(userid);
+			
+			
+			// 받아온 유저 ID를 기반으로 장바구니 테이블에 접근하여 제품번호, 색상, 사이즈를 얻어온다.
+			List<ProductInfoVO> productInfoList = pdao.getSizeAndColor(userid);
+			
+			request.setAttribute("imgList", productList);
+			request.setAttribute("productInfoList", productInfoList);
+			request.setAttribute("cartList", cartList);
+			
+			super.setRedirect(false);
+			super.setViewPage("/WEB-INF/Payment/Payment.jsp");
+		}
 	}
-
+	
 }
