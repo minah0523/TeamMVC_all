@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> 
 
 <%
 String ctxPath = request.getContextPath();
@@ -68,6 +69,7 @@ String ctxPath = request.getContextPath();
    div.discription > ul > li {
    	  margin-bottom: 5px;
    }
+
    div.discription > ul > li > span {
    	  font-size: 10pt;
    } 
@@ -97,6 +99,7 @@ String ctxPath = request.getContextPath();
 
 
 <script type="text/javascript">
+
 	$(document).ready(function(){
 		
 		$("span.pdNo").hide();
@@ -144,20 +147,23 @@ String ctxPath = request.getContextPath();
 		$("li.sort").click(function(){
 			
 			sort = $(this).attr('value');
-			alert("함수 안쓰고 li태그의 sort클래스 클릭 시 value 값은?? " + sort);
+			// alert("함수 안쓰고 li태그의 sort클래스 클릭 시 value 값은?? " + sort);
 			
 			location.href="<%= ctxPath%>/TeamHomePage.neige?sort="+sort;			
 				
 		});	
 		
+
 		// 각각의 이미지를 클릭 했을 경우 
 		$("img.productImgList").click(function(){
 			
 			var pdno = $(this).parent().parent().find(".pdNo").val();
-			alert("pdno ==========> ?" + pdno);
+			// alert("pdno ==========> ?" + pdno);
 			
 		});	
-	});
+		
+
+	}); // end of $(document).ready(function(){}) ----------------
 	
 	
 </script>
@@ -217,8 +223,9 @@ String ctxPath = request.getContextPath();
 <%-- 카테고리 --%>
 <div id = "Catagorys">
 	<ul id = "CategoryLists">
-		<li class = "catego" >
-			<a style = "color:white;" href = "<%= ctxPath %>/TeamHomePage.neige">전체</a>
+		<li class = "0" >
+			<%-- <a style = "color:white;" href = "<%= ctxPath %>/TeamHomePage.neige">전체</a> --%>
+			<a style = "color:white;" href = "<%= ctxPath %>/category/categorySelectList.neige?pdcategory_fk=0">전체</a>
 		</li>
 		
 		<c:forEach var = "category" items = "${requestScope.categoryList}">
@@ -231,7 +238,7 @@ String ctxPath = request.getContextPath();
 </div>
 
 <br> 
-
+ 
  <%-- 정렬 --%>
  <div id = "Order">
 	<div class="col-md-3" id="OrderList" style="margin-left: 1100px;">
@@ -272,6 +279,7 @@ String ctxPath = request.getContextPath();
 		</ul>
 	</div>	
 </div>
+
  
 <br><br>
 
@@ -285,8 +293,8 @@ String ctxPath = request.getContextPath();
 				<div class = "productImg">
 					<img class = "productImgItem" onclick="javascript:window.open('<%= ctxPath%>/ProductDetail.neige?pdno=${productMainImageVo.pdno}', '_self')" src = "<%= ctxPath %>/images2/${productMainImageVo.pdimage1}"/> <!--  onclick = "goProductDetail();"/> -->
 				</div>
-				<div class = "discription">
-					<ul>
+				<div class = "discription" style="text-align: left;">
+					<ul style="padding-inline-start: 5px;">
 						<%-- 제품이름 --%>
 						<li><span class = "pName" style="font-weight: bold; font-size: 11.5pt">${productMainImageVo.pdname}</span></li>
 						<%-- 컬러 리스트 넣는 부분 (반복문) --%>
@@ -301,13 +309,16 @@ String ctxPath = request.getContextPath();
 						<li>
 							<span style="font-weight: bold;">판매가 :  </span>
 								<c:if test="${productMainImageVo.price ne productMainImageVo.saleprice}">
-									<span style="font-size:11px; text-decoration:line-through;">${productMainImageVo.price} </span>
+									<span style="font-size:11px; text-decoration:line-through;">
+										<fmt:formatNumber value="${productMainImageVo.price}" pattern="###,###" />
+									</span>
 							    </c:if>
-							    <span>&nbsp;&nbsp;${productMainImageVo.saleprice}원</span>
+							    
+							    <span>&nbsp;&nbsp;<fmt:formatNumber value="${productMainImageVo.saleprice}" pattern="###,###" />원</span>
                                 <c:if test="${productMainImageVo.price ne productMainImageVo.saleprice}">
                                 	<span class="badge badge-pill badge-warning" style="font-size: 8pt; background-color:lightcoral">SALE</span>
                                 </c:if>									
-						</li>
+						</li>						
 					</ul>
 				</div>
 			</div>
