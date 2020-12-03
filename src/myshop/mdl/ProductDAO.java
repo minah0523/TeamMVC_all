@@ -2742,7 +2742,7 @@ public class ProductDAO implements InterProductDAO {
 		
 		
 		
-		// 홍승의//
+// 홍승의//
 
 	// 물품 상세정보 pdno key 값의 정보를 불러온다. (승의)
 	@Override
@@ -2840,13 +2840,21 @@ public class ProductDAO implements InterProductDAO {
 
 			conn.setAutoCommit(false); // 수동커밋으로 전환
 
-			String sql = " insert into tbl_product_like(fk_userid, fk_pdno) " + " values('admin', ?) ";
+			String sql = " insert into tbl_product_like(fk_userid, fk_pdno) " 
+						+ " values(?, ?) ";
+			
+			System.out.println("paraMap.size " + paraMap.size());
+			
+			String userid = paraMap.get("userid");
+			String pdno = paraMap.get("pdno");
 
 			pstmt = conn.prepareStatement(sql);
-			// pstmt.setString(1, paraMap.get("userid"));
-			pstmt.setString(1, paraMap.get("pdno"));
+			pstmt.setString(1, userid);
+			pstmt.setString(2, pdno);
+			System.out.println("dao-likepart"+ userid);
+			System.out.println("dao-likepart" + pdno);
 
-			pstmt.executeUpdate();
+			n = pstmt.executeUpdate();
 
 			if (n == 1) {
 				conn.commit();
@@ -2865,15 +2873,14 @@ public class ProductDAO implements InterProductDAO {
 	@Override
 	public Map<String, Integer> getLikeCnt(String pdno) throws SQLException {
 
-		Map<String, Integer> map = new HashMap<>();
+		Map<String, Integer> map = new HashMap<String, Integer>();
 
 		try {
 			conn = ds.getConnection();
 
-			String sql = " select count(*) "
-					+ " from tbl_product_like "
-					+ "	 where fk_pdno = ? ";
+			String sql = " select count(*) from tbl_product_like where fk_pdno = ? ";
 
+			
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, pdno);
 
@@ -2886,6 +2893,8 @@ public class ProductDAO implements InterProductDAO {
 		} finally {
 			close();
 		}
+		
+		System.out.println("map.size : " + map.size());
 
 		return map;
 
@@ -2906,14 +2915,14 @@ public class ProductDAO implements InterProductDAO {
 		try {
 			conn = ds.getConnection();
 
-			String sql = " insert into tbl_purchase_reviews(review_seq, fk_userid, fk_pdno, contents, writeDate, starpoint) "
-					+ " values(seq_purchase_reviews.nextval, ?, ?, ?, default, ?) ";
+			String sql = " insert into TBL_PURCHASE_REVIEWS(review_seq, fk_userid, fk_pdno, contents, writeDate) "
+					+ " values(seq_purchase_reviews.nextval, ?, ?, ?, default) ";
 
 			pstmt = conn.prepareStatement(sql);
+			
 			pstmt.setString(1, previewvo.getFk_userid());
 			pstmt.setInt(2, previewvo.getFk_pdno());
 			pstmt.setString(3, previewvo.getContents());
-			pstmt.setString(4, previewvo.getStarpoint());
 
 			n = pstmt.executeUpdate();
 
@@ -2933,8 +2942,8 @@ public class ProductDAO implements InterProductDAO {
 		try {
 			conn = ds.getConnection();
 
-			String sql = "select review_seq, name, fk_pdno, contents, to_char(writeDate, 'yyyy-mm-dd hh24:mi:ss') AS writeDate, starpoint \n"
-					+ "from tbl_purchase_reviews R join tbl_member M \n" + "on R.fk_userid = M.userid\n"
+			String sql = "select review_seq, name, fk_pdno, contents, to_char(writeDate, 'yyyy-mm-dd hh24:mi:ss') AS writeDate \n"
+					+ "from TBL_PURCHASE_REVIEWS R join tbl_member M \n" + "on R.fk_userid = M.userid\n"
 					+ "where R.fk_pdno = ? \n" + "order by review_seq desc ";
 
 			pstmt = conn.prepareStatement(sql);
@@ -2946,7 +2955,6 @@ public class ProductDAO implements InterProductDAO {
 				String contents = rs.getString("contents");
 				String name = rs.getString("name");
 				String writeDate = rs.getString("writeDate");
-				String starpoint = rs.getString("starpoint");
 
 				PurchaseReviewsVO previewvo = new PurchaseReviewsVO();
 				previewvo.setContents(contents);
@@ -3026,8 +3034,8 @@ public class ProductDAO implements InterProductDAO {
 			pstmt = conn.prepareStatement(sql); // prepareStatment로 sql을 보낸다.
 
 			pstmt.setString(1, cartMap.get("userid_fk"));
-			pstmt.setString(1, cartMap.get("pinfono"));
-			pstmt.setString(2, cartMap.get("pqty"));
+			pstmt.setString(2, cartMap.get("pinfono"));
+			pstmt.setString(3, cartMap.get("pqty"));
 
 			CartList = pstmt.executeUpdate();
 
@@ -3087,7 +3095,7 @@ public class ProductDAO implements InterProductDAO {
 
 	}
 
-	/// 승의 끝
+/// 승의 끝
 
 	///////////////////////////////////////김동휘/////////////////////////////////////
 	
