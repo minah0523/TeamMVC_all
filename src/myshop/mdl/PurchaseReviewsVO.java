@@ -9,21 +9,19 @@ public class PurchaseReviewsVO {
    private int fk_pdno; 
    private String contents; 
    private String writeDate;
-   private String starpoint;
    
    private MemberVO mvo;
    private ProductVO pdvo;
    
    public PurchaseReviewsVO() { }
 
-   public PurchaseReviewsVO(int review_seq, String fk_userid, int fk_pdno, String contents, String writeDate, String starpoint,
+   public PurchaseReviewsVO(int review_seq, String fk_userid, int fk_pdno, String contents, String writeDate,
          MemberVO mvo, ProductVO pdvo) {
       this.review_seq = review_seq;
       this.fk_userid = fk_userid;
       this.fk_pdno = fk_pdno;
       this.contents = contents;
       this.writeDate = writeDate;
-      this.starpoint = starpoint;
       this.mvo = mvo;
       this.pdvo = pdvo;
    }
@@ -66,14 +64,6 @@ public class PurchaseReviewsVO {
 
    public void setWriteDate(String writeDate) {
       this.writeDate = writeDate;
-   }
-
-   public String getStarpoint() {
-      return starpoint;
-   }
-
-   public void setStarpoint(String starpoint) {
-      this.starpoint = starpoint;
    }
 
    public MemberVO getMvo() {
