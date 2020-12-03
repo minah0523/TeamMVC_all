@@ -26,6 +26,7 @@ public class ProductDetailAction extends AbstractController {
 				String pdno = "";
 				
 				pdno = request.getParameter("pdno");
+				String gender = request.getParameter("gender");
 				
 				List<ProductVO> productList = pdao.ProductList(pdno);
 				request.setAttribute("productList", productList);
@@ -52,6 +53,7 @@ public class ProductDetailAction extends AbstractController {
 				} else {
 					// 제품이 있는 경우
 					request.setAttribute("pdvo", pdvo); // 제품의 정보
+					request.setAttribute("gender", gender); // 상품이 여성용인지, 남성용인지 확인.
 
 					// request.setAttribute("goBackURL", MyUtil.getCurrentURL(request));
 
