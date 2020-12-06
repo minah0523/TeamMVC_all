@@ -14,15 +14,17 @@ public class CommentListAction extends AbstractController {
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		InterProductDAO pdao = new ProductDAO();
 		
 		String pdno = "";
-		pdno = request.getParameter("fk_pdno");	// 제품번호
-		
-		InterProductDAO pdao = new ProductDAO();
-		List<PurchaseReviewsVO> commentList = pdao.commentList(pdno);
+		pdno = request.getParameter("pdno");	// 제품번호
 		
 		JSONArray jsArr = new JSONArray(); // []
-		System.out.println("commentLisAct commentList : " + commentList);
+		List<PurchaseReviewsVO> commentList = pdao.commentList(pdno);
+		
+		//System.out.println("commentLisAct pdno : " + pdno);
+		//System.out.println("commentLisAct commentList : " + commentList);
+		//System.out.println("commentLisAct commentList size : " + commentList.size());
 		
 		if(commentList != null && commentList.size() > 0) {
 		
@@ -33,16 +35,14 @@ public class CommentListAction extends AbstractController {
 				jsobj.put("writeDate", reviewsvo.getWriteDate());	// {"contents":"제품후기내용물", "name":"작성자이름", "writeDate":"작성일자"}	{"contents":"제품후기내용물2", "name":"작성자이름2", "writeDate":"작성일자2"}
 				
 				jsArr.put(jsobj);	// [ {"contents":"제품후기내용물", "name":"작성자이름", "writeDate":"작성일자"}	{"contents":"제품후기내용물2", "name":"작성자이름2", "writeDate":"작성일자2"} ]
-				System.out.println("commentLisAct jsobj : " + jsobj);
 			}
 			
 		}
 		
 		String json = jsArr.toString();	// 문자열 형태로 변환해줌.
 		
-		System.out.println("commentLisAct json1 : " + json);
 		request.setAttribute("json", json);
-		System.out.println("commentLisAct json2 : " + json);
+		//System.out.println("commentLisAct json2 : " + json);
 		//super.setRedirect(false);
 		super.setViewPage("/WEB-INF/jsonview.jsp");
 		
