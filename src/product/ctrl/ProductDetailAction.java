@@ -62,8 +62,8 @@ public class ProductDetailAction extends AbstractController {
 					// 로그인을 하면 시작페이지로 가는 것이 아니라 방금 봤던 페이지를 그대로 유지하는 것이다.
 					super.goBackURL(request);
 
-					// super.setRedirect(false);
-					super.setViewPage("/WEB-INF/myshop/prodView.jsp");
+					//super.setRedirect(false);
+					super.setViewPage("/WEB-INF/productdetail/ProductDetail.jsp");
 				}
 				
 				
