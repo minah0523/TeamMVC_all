@@ -2894,35 +2894,28 @@ public class ProductDAO implements InterProductDAO {
 			close();
 		}
 		
-		System.out.println("map.size : " + map.size());
-
 		return map;
 
 	}
 
-	@Override
-	public int addCart(Map<String, String> paraMap) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	// Ajax 를 이용한 특정 제품의 상품후기를 입력(insert)하기
 	@Override
-	public int addComment(PurchaseReviewsVO previewvo) throws SQLException {
+	public int addComment(PurchaseReviewsVO reviewsvo) throws SQLException {
 
 		int n = 0;
 
 		try {
 			conn = ds.getConnection();
 
-			String sql = " insert into TBL_PURCHASE_REVIEWS(review_seq, fk_userid, fk_pdno, contents, writeDate) "
+			String sql = " insert into TBL_PURCHASE_REVIEWS(review_seq, fk_userid, fk_pdno, contents, writeDate)\r\n"
 					+ " values(seq_purchase_reviews.nextval, ?, ?, ?, default) ";
 
 			pstmt = conn.prepareStatement(sql);
 			
-			pstmt.setString(1, previewvo.getFk_userid());
-			pstmt.setInt(2, previewvo.getFk_pdno());
-			pstmt.setString(3, previewvo.getContents());
+			pstmt.setString(1, reviewsvo.getFk_userid());
+			pstmt.setInt(2, reviewsvo.getFk_pdno());
+			pstmt.setString(3, reviewsvo.getContents());
 
 			n = pstmt.executeUpdate();
 
@@ -2942,37 +2935,39 @@ public class ProductDAO implements InterProductDAO {
 		try {
 			conn = ds.getConnection();
 
-			String sql = "select review_seq, name, fk_pdno, contents, to_char(writeDate, 'yyyy-mm-dd hh24:mi:ss') AS writeDate \n"
-					+ "from TBL_PURCHASE_REVIEWS R join tbl_member M \n" + "on R.fk_userid = M.userid\n"
-					+ "where R.fk_pdno = ? \n" + "order by review_seq desc ";
+			String sql = "select review_seq, name, fk_pdno, contents, to_char(writeDate, 'yyyy-mm-dd hh24:mi:ss') AS writeDate  "+
+					"from TBL_PURCHASE_REVIEWS R join tbl_member M  "+
+					"on R.fk_userid = M.userid "+
+					"where R.fk_pdno = ?  "+
+					"order by review_seq desc ";
 
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, fk_pdno);
-
+			
 			rs = pstmt.executeQuery();
 
-			while (rs.next()) {
+			while(rs.next()) {
 				String contents = rs.getString("contents");
 				String name = rs.getString("name");
 				String writeDate = rs.getString("writeDate");
-
-				PurchaseReviewsVO previewvo = new PurchaseReviewsVO();
-				previewvo.setContents(contents);
-
+												
+				PurchaseReviewsVO reviewvo = new PurchaseReviewsVO();
+				reviewvo.setContents(contents);
+				
 				MemberVO mvo = new MemberVO();
 				mvo.setName(name);
-
-				previewvo.setMvo(mvo);
-				previewvo.setWriteDate(writeDate);
-
-				CommentList.add(previewvo);
-			}
-
+				
+				reviewvo.setMvo(mvo);
+				reviewvo.setWriteDate(writeDate);
+				
+				CommentList.add(reviewvo);
+			}			
+			
 		} finally {
 			close();
 		}
-
-		return CommentList;
+		
+		return CommentList;		
 	}
 
 	@Override
@@ -3095,7 +3090,7 @@ public class ProductDAO implements InterProductDAO {
 
 	}
 
-/// 승의 끝
+	/// 승의 끝
 
 	///////////////////////////////////////김동휘/////////////////////////////////////
 	
