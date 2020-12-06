@@ -58,97 +58,89 @@
 <script type="text/javascript">
         $(document).ready(function() {
         	
-        	//goLikeCount();	// 좋아요갯수를 보여주도록 하는 것이다.
+        	goLikeCnt();	// 좋아요갯수를 보여주도록 하는 것이다.
         	
-        	//goCommentListView();  // 제품 구매후기를 보여주는 것.
+        	goCommentListView();  // 제품 구매후기를 보여주는 것.
       	  	
-         // **** 제품후기 쓰기 ****// 
-            
-     	   $("button.btnCommentOK").click(function(){
-     		  
-     		   if(${empty sessionScope.loginuser.userid}) {
-     			   alert("제품사용 후기를 작성하시려면 먼저 로그인 하셔야 합니다.");
-     			   return;
-     		   }
-     		   
-     		   var commentContents = $("textarea#commentContents").val().trim();
-     		   
-     		   if(commentContents == "") {
-     			   alert("제품후기 내용을 입력하세요!!");
-     			   return; 
-     		   }
-     		  
-     		   // 보내야할 데이터를 선정하는  방법
-     		   // jQuery에서 사용하는 것으로써,
-     		   // form태그의 선택자.serialize(); 을 해주면 form 태그내의 모든 값들을 name값을 키값으로 만들어서 보내준다. 
-     		   var queryString = $("form[name=commentFrm]").serialize();
-     		   // console.log(queryString); 
-     		   // commentContents=Good&pdno=3
-     		   // alert("detail-jsp queryString check:" + queryString);
-     		   
-     		   $.ajax({
-     			   url:"/TeamMVC/productdetail/commentRegister.neige" ,
-     			   type:"POST",
-     			   data:queryString,
-     			   success:function(){
-     				// alert("확인용 : 제품후기 글쓰기 성공!!");
-     				   goCommentListView(); // 제품후기글을 보여주는 함수호출하기 
-     				   $("textarea#commentContents").val("").focus();
-     			   },
-     			   error: function(request, status, error){
-     					alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
-     			   }
-     		   });
+         // **** 제품후기 쓰기 ****//
+    
+	   $("button[name='btnCommentOK']").click(function(){
+		   
+		   if(${empty sessionScope.loginuser.userid}) {
+			   alert("제품사용 후기를 작성하시려면 먼저 로그인 하셔야 합니다.");
+			   return;
+		   }
+		   
+		   var commentContents = $("textarea#commentContents").val().trim();
+		   
+		   if(commentContents == "") {
+			   alert("제품후기 내용을 입력하세요!!");
+			   return; 
+		   }
+		  
+		   // 보내야할 데이터를 선정하는 첫번째 방법
+	  <%-- 
+		   var queryString = {"fk_userid":'${sessionScope.loginuser.userid}', 
+				              "fk_pdno" : ${pdvo.pdno},
+				              "contents" : $("textarea#commentContents").val()};
+	  --%>
+		   // 보내야할 데이터를 선정하는 두번째 방법
+		   // jQuery에서 사용하는 것으로써,
+		   // form태그의 선택자.serialize(); 을 해주면 form 태그내의 모든 값들을 name값을 키값으로 만들어서 보내준다. 
+		   var queryString = $("form[name=commentFrm]").serialize();
+		   //  console.log(queryString); // commentContents=Good&pdno=3
+   		   
+   		   $.ajax({
+   			   url:"/TeamMVC/productdetail/commentRegister.neige",
+			   type:"POST",
+			   data:queryString,
+			   success:function(){
+				// alert("확인용 : 제품후기 글쓰기 성공!!");
+				   goCommentListView(); // 제품후기글을 보여주는 함수호출하기 
+				   $("textarea#commentContents").val("").focus();
+			   },
+			   error: function(request, status, error){
+					alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
+			   }
+   		   });
      		 
-     		   
      	   });
-
 
         }); // end of ready function---------------
         
      // 특정 제품의 제품후기글들을 보여주는 함수
         function goCommentListView() {
 			
-        	//var pdno = '${pdvo.pdno}';
         	var pdno = $("input:hidden[name=pdno]").val();
         	
-     	   $.ajax({
-     		  url: "/TeamMVC/productdetail/commentList.neige",
-     		  type: "GET",
-   		   	  data: {
-   		   		  "fk_pdno" : pdno
-   		   		  },
-   		   	  dataType:"JSON",
-     		  success:function(json) {
+        	$.ajax({
+     		   url:"/TeamMVC/productdetail/commentList.neige",
+     		   type:"GET",
+     		   data:{"pdno":pdno},
+     		   dataType:"JSON",
+     		   success:function(json) {
      			   // [{"contents":"제품후기내용물", "name":"작성자이름", "writeDate":"작성일자"},{"contents":"제품후기내용물2", "name":"작성자이름2", "writeDate":"작성일자2"}] 
-     			var html = "";
-  				
-  				if (json.length > 0) {    
-  					$.each(json, function(index, item){
-  					  html +=  "<div> <span class='markColor'>▶</span> "+item.contents+"</div>"
-  					         + "<div class='customDisplay'>"+item.name+"</div>"      
-  					         + "<div class='customDisplay'>"+item.writeDate+"</div>"
-  					         + "<div class='customDisplay'>"+item.starpoint+"</div>"
-  					         + "<div class='customDisplay commentDel'>후기삭제</div>";
-  					       
-  					} ); 
-  				}// end of if -----------------------
-  				
-  				else {
-  					html += "<div>등록된 상품후기가 없습니다.</div>";
-  				}// end of else ---------------------
-  				
-  				$("div#viewComments").html(html);	   		   
-  		   		
-  				// == "#sideinfo" 의 height 값 설정해주기 == 
-  				var contentHeight =	$("#content").height();
-  				//	alert(contentHeight);
-  				$("#sideinfo").height(contentHeight);
-  		   },
-  		   error: function(request, status, error){
-  				alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
-  		   }
-  	   });	   
+     			    var html = "";
+     				
+     				if (json.length > 0) {    
+     					$.each(json, function(index, item){
+     						html +=  "<div> <span class='markColor'>▶</span> "+item.contents+"</div>"
+					         + "<div class='customDisplay'>"+item.name+"</div>"      
+					         + "<div class='customDisplay'>"+item.writeDate+"</div>"
+					         + "<div class='customDisplay commentDel'>후기삭제</div>";
+     					} ); 
+     				}// end of if -----------------------
+     				
+     				else {
+    					html += "<div>등록된 상품후기가 없습니다.</div>";
+    				}// end of else ---------------------
+     				
+     				$("div#viewComments").html(html);
+     		   },
+     		   error: function(request, status, error){
+     				alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
+     		   }
+     	   });	   
   	   
      }
 
@@ -192,6 +184,7 @@
                 dataType: "JSON",
                 success: function(json) {
                     $("div#likeCnt").html(json.likecnt);
+                    $("div#likeCnt").show();
                 },
                 error: function(request, status, error) {
                     alert("code: " + request.status + "\n" + "message: " + request.responseText + "\n" + "error: " + error);
@@ -283,7 +276,6 @@
 					</h5>
 				</c:forEach>
 
-				<!--  // 전송한값 테스트 -->
 				<!-- get 방식을 사용해서 데이터 전송 (method="get") -->
 				<form name="addcart" action="/productdetail/cartcheck.jsp"
 					method="GET">
@@ -362,12 +354,12 @@
 			<div class="col-md-2 col-md-offset-5"> 
 				<div id="likeCnt" align="center" style="color: #A5907B; font-size: 20pt;"></div>
 				<img src="<%=request.getContextPath()%>/images/like.png" style="width:30%; cursor: pointer; margin: 0 auto;" onClick="golike()" />
-				<p style="font-weight: bold; font-size: 16pt; color: #353535;">좋아요</p>
+				<p style="font-weight: bold; font-size: 14pt; color: #353535;">좋아요</p>
 			</div>
 		</div>
-	</div>
-	<!-- container -->
-	<span style="font-weight: bold; font-size: 16pt; color: #353535;">제품사용 후기</span>
+	
+	<%-- container  --%>
+	<h3 style="font-weight: bold; font-size: 12pt; color: #353535;">제품사용 후기</h3>
 	<div id="viewComments">
 		<%-- 제품사용 후기 내용입력 --%>
 	</div>
@@ -377,9 +369,9 @@
 		</div>
 		<div>
 			<button type="button" class="customHeight" name="btnCommentOK" style="font-weight: bold; font-size: 11pt">후기등록</button>
+		<input type="hidden" name="userid" value="${sessionScope.loginuser.userid}" />
+    	<input type="hidden" name="pdno" value="${pdvo.pdno}" />
 		</div>
-		<input type="hidden" name="fk_userid" value="${sessionScope.loginuser.userid}" /> 
-		<input type="hidden" name="fk_pdno" value="${pdvo.pdno}" />
 	</form>
 
 	</div>
